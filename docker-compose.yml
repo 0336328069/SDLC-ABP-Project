@@ -1,0 +1,157 @@
+version: '3.8'
+
+services:
+  # SQL Server Database (thay vì PostgreSQL)
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: abpapp-sqlserver
+    environment:
+      SA_PASSWORD: "YourStrong@Passw0rd"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./src/backend/docker/sqlserver/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - abpapp-network
+    restart: unless-stopped
+    command:
+      - /bin/bash
+      - -c
+      - |
+        # Start SQL Server in background
+        /opt/mssql/bin/sqlservr &
+        
+        # Wait for SQL Server to start
+        sleep 30
+        
+        # Create database if not exists
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "YourStrong@Passw0rd" -Q "
+        IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'AbpApp')
+        BEGIN
+          CREATE DATABASE AbpApp;
+        END"
+        
+        # Keep container running
+        wait
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: abpapp-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - abpapp-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: abpapp-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - abpapp-network
+    restart: unless-stopped
+
+  # Backend API
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+    container_name: abpapp-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Default=Server=sqlserver;Database=AbpApp;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
+      - Redis__Configuration=redis:6379
+      - RabbitMQ__Connections__Default__HostName=rabbitmq
+      - RabbitMQ__Connections__Default__UserName=admin
+      - RabbitMQ__Connections__Default__Password=admin123
+    ports:
+      - "44300:80"
+      - "44301:443"
+    depends_on:
+      - sqlserver
+      - redis
+      - rabbitmq
+    networks:
+      - abpapp-network
+    restart: unless-stopped
+    volumes:
+      - ./src/backend/logs:/app/logs
+
+  # Frontend Web App
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    container_name: abpapp-frontend
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:44300
+      - NEXT_PUBLIC_SIGNALR_URL=http://localhost:44300
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - abpapp-network
+    restart: unless-stopped
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+      - /app/.next
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: abpapp-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/ssl:/etc/ssl/certs
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - abpapp-network
+    restart: unless-stopped
+
+  # Seq Logging (Development)
+  seq:
+    image: datalust/seq:latest
+    container_name: abpapp-seq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - "5341:80"
+    volumes:
+      - seq_data:/data
+    networks:
+      - abpapp-network
+    restart: unless-stopped
+
+volumes:
+  sqlserver_data:
+  redis_data:
+  rabbitmq_data:
+  seq_data:
+
+networks:
+  abpapp-network:
+    driver: bridge

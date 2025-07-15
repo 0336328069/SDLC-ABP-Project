@@ -1,0 +1,69 @@
+{
+  "name": "abp-enterprise-app",
+  "version": "1.0.0",
+  "description": "Enterprise application built with ABP Framework and Next.js",
+  "private": true,
+  "workspaces": [
+    "src/frontend/*",
+    "src/frontend/packages/*"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd src/frontend && npm install && cd ../backend && dotnet restore",
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "build": "npm run backend:build && npm run frontend:build",
+    "test": "npm run backend:test && npm run frontend:test",
+    "lint": "npm run frontend:lint",
+    "backend:dev": "cd src/backend && dotnet watch run --project src/AbpApp.HttpApi.Host",
+    "backend:build": "cd src/backend && dotnet build",
+    "backend:test": "cd src/backend && dotnet test",
+    "backend:migrate": "cd src/backend && dotnet ef database update --project src/AbpApp.EntityFrameworkCore",
+    "frontend:dev": "cd src/frontend && npm run dev",
+    "frontend:build": "cd src/frontend && npm run build",
+    "frontend:test": "cd src/frontend && npm run test",
+    "frontend:lint": "cd src/frontend && npm run lint",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build",
+    "docker:logs": "docker-compose logs -f",
+    "db:seed": "cd src/backend && dotnet run --project tools/AbpApp.DbMigrator",
+    "db:reset": "npm run docker:down && docker volume prune -f && npm run docker:up && npm run db:seed",
+    "db:backup": "docker exec postgres pg_dump -U postgres abpapp > backup.sql",
+    "setup": "npm run install:all && npm run docker:up && npm run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "src/frontend/**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "src/backend/**/*.cs": [
+      "dotnet format"
+    ]
+  },
+  "keywords": [
+    "abp-framework",
+    "nextjs",
+    "react",
+    "typescript",
+    "enterprise",
+    "ddd",
+    "clean-architecture",
+    "cqrs"
+  ],
+  "author": "Your Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

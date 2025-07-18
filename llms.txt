@@ -1,0 +1,58 @@
+# ABP Enterprise Application with Next.js
+
+> Ứng dụng web doanh nghiệp, mở rộng và dễ bảo trì, xây dựng trên ABP Framework (.NET 9.0, ABP 8.3.0) và Next.js 14+. Áp dụng Domain-Driven Design, Clean Architecture, triển khai full-stack, hỗ trợ container hóa.
+
+## Tech Stack
+
+### Backend
+- .NET 9.0 & ABP Framework 8.3.0 (DDD, Clean Architecture, Modular Monolith)
+- RESTful API với OpenAPI/Swagger
+- SQL Server (mặc định, có thể cấu hình PostgreSQL)
+- Entity Framework Core 9.0
+- Redis (caching), RabbitMQ (messaging)
+- Serilog (ghi log ra file & console)
+- Authentication: IdentityServer, JWT Bearer, ABP Permission System
+- Localization: Hỗ trợ tiếng Việt & tiếng Anh (JSON resource)
+
+### Frontend
+- Next.js 14+ (App Router)
+- TypeScript, React 18+
+- Tailwind CSS, Radix UI, Lucide Icons
+- TanStack Query (React Query), Zustand
+- React Hook Form + Zod
+- NextAuth.js (authentication)
+- Storybook, Jest, React Testing Library
+
+### DevOps & Tooling
+- Docker, Docker Compose
+- Nginx (web server/proxy)
+- ESLint, Prettier (lint/format code frontend)
+- Husky, lint-staged (pre-commit cho JS/TS & C#)
+- Bash script tự động setup (`scripts/setup.sh`)
+
+## General Development Workflow
+
+Quy trình phát triển CRUD mới:
+
+### Backend Workflow
+1.  **Domain Layer**: Định nghĩa entity trong `src/backend/src/AbpApp.Domain`.
+2.  **EF Core Layer**: Thêm `DbSet` vào `AbpAppDbContext.cs`, chạy `dotnet ef migrations add ...` & `dotnet ef database update`.
+3.  **Application.Contracts Layer**: Định nghĩa DTO, interface AppService.
+4.  **Application Layer**: Implement AppService, cấu hình AutoMapper.
+
+### Frontend Workflow
+1.  **Service Layer**: Tạo `[entityName]Service.ts` trong `src/frontend/services` để gọi API backend.
+2.  **UI Layer**: Tạo page/component trong `src/frontend/app` và `src/frontend/components`. Sử dụng TanStack Query (`useQuery`, `useMutation`) cho state.
+
+## Getting Started
+
+- **Docker (Khuyến nghị):** Chạy `docker-compose up -d`. Ứng dụng tại `http://localhost:3000`.
+- **Manual Setup:** Xem chi tiết trong [Setup Guide](./setup.md).
+
+## Key Project Files
+
+- [Main Readme](./README.md): Tổng quan dự án.
+- [Setup Guide](./setup.md): Hướng dẫn cài đặt chi tiết.
+- [Backend Solution](./src/backend/AbpApp.sln): Điểm vào solution .NET.
+- [Frontend Package](./src/frontend/package.json): Điểm vào Next.js app.
+- [Docker Compose](./docker-compose.yml): Định nghĩa các service phát triển.

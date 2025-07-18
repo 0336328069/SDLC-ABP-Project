@@ -6,7 +6,8 @@
 
 #### Backend Requirements
 - **.NET 8 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/8.0)
-- **PostgreSQL 15+** - [Download](https://www.postgresql.org/download/)
+- **PostgreSQL 15+** - [Download](https://www.postgresql.org/download/) (Khuyến nghị cho Docker setup)
+- **SQL Server** (Nếu bạn muốn chạy local không dùng Docker, xem `README-SQL-SERVER-LOCAL.md`)
 - **Redis 7+** - [Download](https://redis.io/download)
 - **Docker & Docker Compose** - [Download](https://docs.docker.com/get-docker/)
 
@@ -77,13 +78,16 @@ Chỉnh sửa file `src/backend/src/AbpApp.HttpApi.Host/appsettings.json`:
 #### 2.4. Chạy Migration
 
 ```bash
-cd src/backend
+# Lệnh này được chạy từ thư mục src/backend
 dotnet ef database update --project src/AbpApp.EntityFrameworkCore
 ```
 
 #### 2.5. Seed dữ liệu mẫu
 
 ```bash
+# Quay lại thư mục gốc của dự án
+cd ../.. 
+# Chạy DbMigrator từ thư mục gốc
 dotnet run --project tools/AbpApp.DbMigrator
 ```
 
@@ -108,7 +112,11 @@ npm install
 
 Copy file environment:
 ```bash
+# Đối với Linux/macOS
 cp .env.example .env.local
+
+# Đối với Windows (Command Prompt)
+copy .env.example .env.local
 ```
 
 Chỉnh sửa `.env.local`:

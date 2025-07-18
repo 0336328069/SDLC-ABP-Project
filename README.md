@@ -1,202 +1,134 @@
-# ABP Enterprise Application
+# ABP Enterprise Application with Next.js
 
-Một ứng dụng enterprise-grade được xây dựng trên ABP Framework với modern frontend stack.
+Đây là ứng dụng doanh nghiệp mạnh mẽ, sẵn sàng cho sản xuất, xây dựng trên nền tảng ABP Framework (.NET 9.0, ABP 8.3.0) và Next.js 14+, hướng đến khả năng mở rộng và bảo trì lâu dài.
+
+## 📚 Tài liệu dự án
+
+- **[AI/LLM Guide (`llms.txt`)](./llms.txt)**: Chuẩn llmstxt.org cho AI assistant hiểu kiến trúc, quy ước code, workflow.
+- **[Setup Guide (`setup.md`)](./setup.md)**: Hướng dẫn chi tiết cài đặt môi trường phát triển.
 
 ## 🚀 Tech Stack
 
-### Backend - ABP Framework
-- **.NET 8** - Latest LTS version
-- **ABP Framework** - Enterprise application framework
-- **Domain Driven Design (DDD)** - Clean architecture
-- **CQRS + MediatR** - Command Query Responsibility Segregation
-- **Entity Framework Core** - ORM với Code First
-- **Redis** - Caching và distributed cache
-- **RabbitMQ** - Message broker cho domain events
-- **PostgreSQL** - Primary database
-- **AutoMapper** - Object mapping
-- **FluentValidation** - Input validation
-- **Serilog** - Structured logging
-- **OpenAPI/Swagger** - API documentation
+### Backend
+- **Framework:** .NET 9.0 & ABP Framework 8.3.0
+- **Kiến trúc:** Domain-Driven Design (DDD), Clean Architecture, Modular Monolith
+- **API:** ASP.NET Core RESTful API, OpenAPI (Swagger)
+- **ORM:** Entity Framework Core 9.0
+- **Database:** SQL Server (mặc định, có thể cấu hình PostgreSQL)
+- **Caching:** Redis
+- **Message Broker:** RabbitMQ
+- **Logging:** Serilog (ghi log ra file & console)
+- **Authentication:** IdentityServer, JWT Bearer, ABP Permission System
+- **Localization:** Hỗ trợ tiếng Anh & tiếng Việt (JSON resource)
 
-### Frontend - Next.js
-- **Next.js 15** - React framework với App Router
-- **React 19** - Latest version với concurrent features
-- **TypeScript 5** - Full type coverage
-- **TailwindCSS 3.4** - Utility-first CSS framework
-- **Atomic Design** - Component architecture
-- **React Query (TanStack Query)** - Server state management
-- **Zustand** - Client state management
-- **React Hook Form** - Form handling
-- **Zod** - Schema validation
-- **Framer Motion** - Animation library
+### Frontend
+- **Framework:** Next.js 14+ (App Router)
+- **Ngôn ngữ:** TypeScript, React 18+
+- **UI:** Tailwind CSS, Radix UI, Lucide Icons
+- **State Management:** TanStack Query (React Query), Zustand
+- **Forms:** React Hook Form + Zod
+- **Authentication:** NextAuth.js
+- **Component Library:** Storybook
+- **Testing:** Jest, React Testing Library
 
-### Development Tools
-- **Docker & Docker Compose** - Containerization
-- **ESLint + Prettier** - Code formatting
-- **Husky** - Git hooks
-- **Conventional Commits** - Commit standards
-- **GitHub Actions** - CI/CD pipeline
+### DevOps & Tooling
+- **Containerization:** Docker, Docker Compose
+- **Web Server/Proxy:** Nginx (qua Docker)
+- **Linting & Formatting:** ESLint, Prettier
+- **Setup Automation:** Bash script (`scripts/setup.sh`)
+- **Pre-commit:** Husky, lint-staged (tự động format/lint code trước khi commit)
 
-## 🏗️ Architecture
+## 🏗️ Cấu trúc thư mục
 
 ```
-src/
-├── backend/
-│   ├── src/
-│   │   ├── AbpApp.Domain/           # Domain layer (Entities, Domain Services)
-│   │   ├── AbpApp.Domain.Shared/    # Shared domain concepts
-│   │   ├── AbpApp.Application/      # Application layer (App Services, DTOs)
-│   │   ├── AbpApp.Application.Contracts/ # Application interfaces
-│   │   ├── AbpApp.HttpApi/          # HTTP API layer (Controllers)
-│   │   ├── AbpApp.HttpApi.Client/   # HTTP client
-│   │   ├── AbpApp.HttpApi.Host/     # API hosting
-│   │   └── AbpApp.EntityFrameworkCore/ # Data access layer
-│   ├── test/
-│   └── docker/
-└── frontend/
-    ├── apps/
-    │   └── web/                     # Next.js application
-    ├── packages/
-    │   ├── ui/                      # Shared UI components
-    │   ├── config/                  # Shared configurations
-    │   └── types/                   # Shared TypeScript types
-    └── docker/
+.
+├── docker-compose.yml         # Định nghĩa các service cho local dev
+├── package.json               # Root package file
+├── README.md                  # File này
+├── scripts/
+│   └── setup.sh               # Script setup tự động
+├── src/
+│   ├── backend/               # .NET ABP Framework solution
+│   │   ├── AbpApp.sln
+│   │   └── src/
+│   │       ├── AbpApp.Application
+│   │       ├── AbpApp.Domain
+│   │       ├── AbpApp.EntityFrameworkCore
+│   │       └── AbpApp.HttpApi.Host  # Startup project cho API
+│   └── frontend/              # Next.js application
+│       ├── app/                 # App Router directory
+│       ├── components/          # Shared React components
+│       ├── lib/                 # Utility functions
+│       └── package.json
+└── tools/
+    └── AbpApp.DbMigrator/       # Tool migrate & seed database
 ```
 
-## 🎯 Features
+## 🚦 Khởi động nhanh
 
-### ABP Framework Features
-- ✅ **Multi-tenancy** - SaaS ready architecture
-- ✅ **Authentication & Authorization** - JWT + Permission system
-- ✅ **Audit Logging** - Automatic entity change tracking
-- ✅ **Localization (i18n)** - Multi-language support
-- ✅ **Background Jobs** - Hangfire integration
-- ✅ **Event Bus** - Domain events với RabbitMQ
-- ✅ **Caching** - Redis distributed cache
-- ✅ **Settings Management** - Dynamic configuration
-- ✅ **Feature Management** - Feature flags
-- ✅ **Email & SMS** - Notification system
+Bạn có thể chạy dự án bằng Docker (khuyến nghị) hoặc setup thủ công.
 
-### Frontend Features
-- ✅ **Server-Side Rendering (SSR)** - SEO optimization
-- ✅ **Static Site Generation (SSG)** - Performance optimization
-- ✅ **Progressive Web App (PWA)** - Mobile-first experience
-- ✅ **Dark/Light Theme** - User preference
-- ✅ **Responsive Design** - Mobile-first approach
-- ✅ **Type-safe API Client** - Auto-generated từ OpenAPI
-- ✅ **Real-time Updates** - SignalR integration
-- ✅ **Offline Support** - Service Worker
-- ✅ **Accessibility (a11y)** - WCAG 2.1 compliant
+### 1. Docker Setup (Khuyến nghị)
 
-## 🚦 Quick Start
+**Yêu cầu:**
+- Docker & Docker Compose
 
-### Prerequisites
-- **.NET 8 SDK**
-- **Node.js 20+**
-- **Docker & Docker Compose**
-- **PostgreSQL 15+**
-- **Redis 7+**
+**Các bước:**
+1. Clone repository.
+2. Chạy lệnh:
+    ```bash
+    docker-compose up -d
+    ```
+3. Truy cập các endpoint:
+    - **Frontend**: `http://localhost:3000`
+    - **Backend API**: `http://localhost:44300`
+    - **Swagger UI**: `http://localhost:44300/swagger`
+    - **Seq (Logging)**: `http://localhost:5341`
+    - **RabbitMQ Management**: `http://localhost:15672` (user: `admin`, pass: `admin123`)
 
-### Development Setup
+### 2. Setup tự động local (Linux/macOS)
 
-1. **Clone repository**
-```bash
-git clone <repository-url>
-cd abp-enterprise-app
-```
+**Yêu cầu:**
+- .NET 9 SDK
+- Node.js 20+
+- Docker & Docker Compose (cho database, Redis, RabbitMQ)
 
-2. **Backend setup**
-```bash
-cd src/backend
-dotnet restore
-dotnet ef database update
-dotnet run --project src/AbpApp.HttpApi.Host
-```
+**Các bước:**
+1. Clone repository.
+2. Chạy script:
+    ```bash
+    ./scripts/setup.sh
+    ```
+    Script sẽ:
+    - Kiểm tra dependencies
+    - Tạo file env
+    - Cài backend & frontend dependencies
+    - Khởi động hạ tầng (SQL Server/PostgreSQL, Redis, RabbitMQ)
+    - Migrate & seed database
+    - Build project
+    - Start dev server
 
-3. **Frontend setup**
-```bash
-cd src/frontend
-npm install
-npm run dev
-```
+### 3. Setup thủ công
 
-4. **Docker setup (Recommended)**
-```bash
-docker-compose up -d
-```
+Xem chi tiết trong **[Setup Guide (`setup.md`)](./setup.md)** (hỗ trợ cả SQL Server & PostgreSQL).
 
-### Environment Variables
+## 🌐 Localization
+- Hỗ trợ tiếng Việt và tiếng Anh (JSON resource)
+- Có thể mở rộng thêm ngôn ngữ khác dễ dàng
 
-Copy `.env.example` to `.env` và cấu hình:
+## 🛡️ Bảo mật & xác thực
+- Backend sử dụng IdentityServer, JWT Bearer, ABP Permission System
+- Frontend sử dụng NextAuth.js, lưu token an toàn, tích hợp RBAC
 
-```env
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/abpapp"
+## 🧪 Testing
+- **Frontend:** Jest, React Testing Library, Storybook
+- **Backend:** dotnet test (các project test riêng)
 
-# Redis
-REDIS_URL="redis://localhost:6379"
-
-# JWT
-JWT_SECRET="your-super-secret-jwt-key"
-JWT_ISSUER="AbpApp"
-
-# Email
-SMTP_HOST="smtp.gmail.com"
-SMTP_PORT=587
-SMTP_USERNAME="your-email@gmail.com"
-SMTP_PASSWORD="your-app-password"
-```
-
-## 📚 Documentation
-
-- [Architecture Guide](docs/architecture.md)
-- [Development Guide](docs/development.md)
-- [API Documentation](docs/api.md)
-- [Deployment Guide](docs/deployment.md)
-- [Contributing Guide](docs/contributing.md)
-
-## 🔧 Scripts
-
-```bash
-# Backend
-npm run backend:dev          # Start backend development
-npm run backend:build        # Build backend
-npm run backend:test         # Run backend tests
-npm run backend:migrate      # Run database migrations
-
-# Frontend
-npm run frontend:dev         # Start frontend development
-npm run frontend:build       # Build frontend
-npm run frontend:test        # Run frontend tests
-npm run frontend:lint        # Lint frontend code
-
-# Docker
-npm run docker:up            # Start all services
-npm run docker:down          # Stop all services
-npm run docker:build         # Build all images
-npm run docker:logs          # View logs
-
-# Database
-npm run db:seed              # Seed database with sample data
-npm run db:reset             # Reset database
-npm run db:backup            # Backup database
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## 🛠️ Tooling
+- **Husky/lint-staged:** Tự động lint/format code trước khi commit (JS/TS, C#)
+- **ESLint/Prettier:** Chuẩn hóa code frontend
+- **dotnet format:** Chuẩn hóa code backend
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Team
-
-- **Architecture** - ABP Framework + Clean Architecture
-- **Backend** - .NET 8 + Entity Framework Core
-- **Frontend** - Next.js 15 + React 19
-- **DevOps** - Docker + GitHub Actions
+Dự án sử dụng giấy phép MIT.

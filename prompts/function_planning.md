@@ -1,97 +1,88 @@
-# Function Planning Automation Prompt Template
+# Universal Function Planning Automation Prompt Template
 
 ## Context
 
-You are a Senior Solution Architect specializing in ABP Framework (.NET 9.0, ABP 8.3.0) with Next.js 14+.
-You are implementing the feature `[FeatureName]` under an enterprise application with DDD, Clean Architecture, Modular Monolith, as defined by the technical stack and workflow in `llms.txt` and `README.md`.  
-All business requirements have already been translated into technical documentation by the DEV team. Your goal is to deliver a step-by-step technical implementation plan mapped to the exact project structure.
+You are a Senior Solution Architect.  
+Your task is to create a comprehensive, actionable, step-by-step implementation plan for the feature `[FeatureName]` based **strictly** on the technical documentation and conventions provided below.  
+This documentation defines the project's tech stack, architectural patterns, codebase structure, naming conventions, workflows, and any other rules relevant for development.
 
-## Input Files (read from `/docs/`):
+- Do not assume or invent any technology, subfolder, file name, code snippet, standard, convention, or migration procedure unless it is clearly described in the technical documents below.
+- Always extract actual tech stack, framework, file/folder paths, naming styles, and workflow steps directly from the context (e.g. llms.txt, CodeConventionDocument, project-specific README).
+- If the documentation lacks a detail, explicitly note it as an open question, and do not fill it in by assumption.
 
-Use **only** the following as input context:
-- TechnicalFeasibilityAnalysis_[FeatureName]_v1.0.md
+## Dev Documentation (provided in full as context):
 - SystemArchitectureDesign_[FeatureName]_v1.0.md
 - HighLevelDesign_[FeatureName]_v1.0.md
 - ERD_[FeatureName]_v1.0.md
 - CodeConventionDocument_[FeatureName]_v1.0.md
 - LowLevelDesign_[FeatureName]_v1.0.md
-- API_Swagger_[FeatureName]_v1.0.yaml
-- llms.txt (overall tech stack, workflow, folder conventions)
-- [Optionally] README.md (if you need explicit folder mapping)
-
-> **Never** use any raw BA/Product files at this step – all domain/business logic has been fully incorporated into the above documentation.
-
-## Output Requirements
-
-Create a file named `ImplementPlan_[FeatureName]_v1.0.md` with the following structure.  
-**All instructions must be in clear, actionable, technical English and directly map to the real codebase.**
+- API_Swagger_[FeatureName]_v1.0.yaml or .md
+- llms.txt (project tech stack, workflow, naming, conventions, toolchain)
+- [Optionally] README.md or equivalent (if included in input context)
 
 ---
+
+## Output Requirement
+
+Produce a file: `ImplementPlan_[FeatureName]_v1.0.md` that provides all of the following sections (adapt section details based only on context):
 
 ### 1. Executive Summary
-
-- Summarize the purpose, technical approach, overall architecture, and target outcomes for `[FeatureName]`.
+- Summarize the purpose, technical strategy, key architectural decisions, and target outcomes for `[FeatureName]`—using only context facts.
 
 ### 2. Development Phases
-
-- Break implementation into ordered, independent phases. Each phase must have inputs, expected artifacts, and handoff criteria.
+- Break the implementation into clear, ordered, and independent phases.  
+- Each phase must specify: required inputs, expected artifacts/files/classes, and handoff/done criteria.
 
 ### 3. Backend Implementation Plan
+- For every backend module/folder defined in the documentation, detail:
+    - Concrete file path(s) and naming, exactly according to conventions/context.
+    - Class/interface responsibilities and relationships.
+    - Method signatures, DTO/model definitions, and example code where context provides it.
+    - All code, migration, and configuration actions must follow the described frameworks and conventions.
+    - For DB: reference migrations, schema updates, scripts, and tools as specified in the docs.
 
-- For each ABP project/folder (`AbpApp.Domain`, `AbpApp.EntityFrameworkCore`, `AbpApp.Application.Contracts`, `AbpApp.Application`, `AbpApp.HttpApi`, `AbpApp.HttpApi.Host`), specify:
-    - Concrete file path(s) to create/modify (e.g. `src/backend/src/AbpApp.Domain/[FeatureName]/[NewEntity].cs`)
-    - Class/interface responsibilities and relationships
-    - Key method signatures, example DTOs/interface definitions (with code where relevant)
-    - Reference all applicable conventions and workflow steps from input docs
-    - For migrations: DbSet locations, script samples, and required CLI commands
-
-### 4. Frontend Implementation Plan
-
-- Map backend endpoints to precise frontend files (`/app/`, `/components/`, `/services/`, `/stores/`, etc).
-- Specify relevant Zod schemas, service module setup, React Hooks (TanStack Query), and NextAuth.js flows.
-- Provide filenames, key function signatures, and code samples where needed.
+### 4. Frontend Implementation Plan (if context includes a frontend)
+- Map each backend endpoint to frontend file/component/page/service according to project conventions.
+- State validation approach and schemas, service integration, state management, routing, etc., as described in context.
+- Always use the real file/folder/naming described or exemplified in the docs.
 
 ### 5. Database Migration Plan
-
-- Describe all necessary DB migrations (tables/fields/constraints/indexes)
-- List commands and migration file names, mapping them to project scripts/tools
+- Describe DB/table/field/index changes, naming, location and sample migration commands/scripts strictly as described (do NOT assume "EF", "Sequelize", "Flyway", etc unless in context).
 
 ### 6. Testing Strategy
-
-- Backend: Outline unit, integration, and (if relevant) end-to-end tests with test file locations and sample cases.
-- Frontend: Outline component, page, and E2E tests with locations and examples.
-- All test cases must point to the critical flows and negative cases from the requirements.
+- For both backend and frontend, specify all tests, tools, folder structure and code for setup/usage as described—do not guess any library not defined in the docs.
 
 ### 7. Security Implementation
-
-- Explicitly enumerate and describe security mechanisms (passwords, tokens, permissions, rate limiting, etc) as implemented for this feature.
-- Map each non-functional security requirement to technical design/spec in the codebase.
+- Enumerate exactly those security requirements and mechanisms (e.g. auth, encryption, permission, validation, rate limiting...) described in the input docs, mapped to files/classes/configs as per convention.
 
 ### 8. Performance Optimization
-
-- Identify and plan necessary caching, async processing, concurrency strategies, and logging/metrics related to `[FeatureName]`.
+- Lay out tuning, caching, scaling, async, or monitoring specifics as relevant for the stack in context.
 
 ### 9. Deployment Checklist
-
-- Document all required environment variables, configuration, build, database update, and smoke test steps for this feature.
+- List required environment variables, configuration, build, deployment, smoke-test steps adapted to the described tech/workflow/tools.
 
 ### 10. Validation Criteria
+- List the specific technical and business acceptance criteria for `[FeatureName]`, referencing the corresponding file/class/methods/tests in codebase as per documentation.
 
-- List all technical validation criteria for `[FeatureName]`, referencing file/class/method/test for audits and code review traceability.
+---
+## Enhanced Guidelines for Multi-stack/Enterprise Context
+
+- **Only** use data, technology, naming, structure, workflow as specified in the input documentation (e.g. llms.txt, CodeConventionDocument, README).  
+- **Do not** hallucinate, default, or infer any convention, tool, or code unless it is IN the context.  
+- **Mark all missing details as**  
+  > **Open question: [missing detail]**
+- **Never** hard-code any stack-specific folder/file/convention (e.g., ABP, .NET, Next.js, Java, Node.js, etc) unless clearly defined in input.
+- Write in concise, actionable English.
 
 ---
 
-**Guidelines:**
-- Use only information available in the input files; never hallucinate about business flow, tech stack, or folder structure.
-- All output instructions must be clear, actionable, stepwise, and suitable for direct code generation by Gemini CLI/Claude or for onboarding a developer.
-- All references (paths, classes, functions) must match the current codebase (as per screenshots above).
-- Write output in precise technical English. Do not include or repeat architectural background—assume all info is already in docs.
+## How to Use:
+- Replace `[FeatureName]` with your intended feature or module.
+- Always concatenate this prompt, then all input docs (llms.txt, CodeConventionDocument, etc) as plain text under the prompt—never as file references, always raw content.
+- Feed the combined text into Gemini CLI, Claude, or your preferred AI codegen tool.
+- Use this plan for both automated code generation and onboarding/review.
 
 ---
 
-**How to Use:**  
-- Replace `[FeatureName]` with the specific domain or module you are implementing (e.g., `Authentication`, `OrderManagement`).
-- This prompt is reusable for any feature.  
-- Feed it, plus the relevant feature’s Dev Docs, into Gemini CLI or your SDLC automation workflow.
-
----
+**Note:**  
+This multi-stack prompt ensures all guidance comes from your actual project input—never from hard-coded or assumed best practices. All sections are required and must be present; any information lacking from context must be called out as an open question for the project team to clarify.

@@ -8,7 +8,7 @@ This documentation defines the project's tech stack, architectural patterns, cod
 
 - Do not assume or invent any technology, subfolder, file name, code snippet, standard, convention, or migration procedure unless it is clearly described in the technical documents below.
 - Always extract actual tech stack, framework, file/folder paths, naming styles, and workflow steps directly from the context (e.g. llms.txt, CodeConventionDocument, project-specific README).
-- If the documentation lacks a detail, explicitly note it as an open question, and do not fill it in by assumption.
+- If the documentation lacks a detail, explicitly note it as an open question using **TBD: [missing detail]**, and do not fill it in by assumption.
 
 ## Dev Documentation (provided in full as context):
 - SystemArchitectureDesign_[FeatureName]_v1.0.md
@@ -70,7 +70,7 @@ Produce a file: `ImplementPlan_[FeatureName]_v1.0.md` that provides all of the f
 - **Only** use data, technology, naming, structure, workflow as specified in the input documentation (e.g. llms.txt, CodeConventionDocument, README).  
 - **Do not** hallucinate, default, or infer any convention, tool, or code unless it is IN the context.  
 - **Mark all missing details as**  
-  > **Open question: [missing detail]**
+  > **TBD: [missing detail]**
 - **Never** hard-code any stack-specific folder/file/convention (e.g., ABP, .NET, Next.js, Java, Node.js, etc) unless clearly defined in input.
 - Write in concise, actionable English.
 

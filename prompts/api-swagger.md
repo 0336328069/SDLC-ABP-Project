@@ -11,23 +11,24 @@ Your task is to create a comprehensive OpenAPI/Swagger specification document fo
 - If the documentation lacks a detail, explicitly use **TBD** for the missing value, and do not fill it in by assumption.
 
 ## Dev Documentation (provided in full as context):
-
-- PRD_[FeatureName]_v1.0.md
-- SRS&DM_[FeatureName]_v1.0.md
-- US_[FeatureName]_v1.0.md
-- Vision_[FeatureName]_v1.0.md
+- CodeConventionDocument_[FeatureName].md
 - TechStack.md
-- team-capabilities-file.md
-- Technical_Feasibility_[FeatureName].md
-- HighLevelDesign_[FeatureName].md
-- ERD_[FeatureName].md
 - LowLevelDesign_[FeatureName].md
 
 ---
 
 ## Output Requirement
 
-Produce a file: `API_Swagger_[FeatureName].yaml` with the following OpenAPI 3.0.3 specification:
+**IMPORTANT: You must create and save the output file to the correct location: `docs/DEV/API_Swagger_[FeatureName].yaml`**
+
+**CRITICAL INSTRUCTIONS:**
+1. **File Creation**: Generate the complete OpenAPI/Swagger specification and save it as `docs/DEV/API_Swagger_[FeatureName].yaml`
+2. **File Path**: Ensure the file is created in the `docs/DEV/` directory
+3. **Complete Output**: Provide the entire YAML specification, not just a summary
+4. **Format**: Use proper YAML formatting with correct indentation and syntax
+5. **No Placeholders**: Fill in all sections with actual content based on the provided context
+
+Produce a complete file: `docs/DEV/API_Swagger_[FeatureName].yaml` with the following OpenAPI 3.0.3 specification:
 
 - **ADHERE TO OPENAPI 3.0.3 STRUCTURE**: Use the exact structure and field names as in the template below, with valid YAML formatting.
 - **INCLUDE ALL REQUIRED COMPONENTS**: Ensure schemas, paths, parameters, responses, and security schemes are fully defined.
@@ -76,3 +77,16 @@ Produce a file: `API_Swagger_[FeatureName].yaml` with the following OpenAPI 3.0.
 - Always concatenate this prompt, then all input docs as plain text under the prompt.
 - Feed the combined text into your preferred AI API documentation tool.
 - Use this specification for API development, testing, and client integration.
+
+---
+
+## FINAL INSTRUCTION:
+
+**CRITICAL**: After generating the OpenAPI/Swagger specification, you MUST:
+1. **Create the complete YAML file** with all sections filled out
+2. **Save it to the correct path**: `docs/DEV/API_Swagger_[FeatureName].yaml`
+3. **Provide the full YAML specification** in your response
+4. **Do not stop until the entire specification is complete**
+5. **Include all required components** with actual content, not placeholders
+
+**START CREATING THE FILE NOW: `docs/DEV/API_Swagger_[FeatureName].yaml`**

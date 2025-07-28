@@ -11,21 +11,26 @@ Your task is to create a comprehensive, detailed Low-Level Design (LLD) document
 
 ## Input Documents (provided in full as context):
 
+- SRS&DM_[FeatureName]_v1.0.md
 - HighLevelDesign_[FeatureName].md
 - ERD_[FeatureName].md
-- PRD_[FeatureName]_v1.0.md
-- SRS&DM_[FeatureName]_v1.0.md
-- US_[FeatureName]_v1.0.md
-- Vision_[FeatureName]_v1.0.md
+- CodeConventionDocument_[FeatureName].md
 - TechStack.md
-- team-capabilities-file.md
-- Technical_Feasibility_[FeatureName].md
 
 ---
 
 ## Output Requirement
 
-Produce a file: `LowLevelDesign_[FeatureName].md` with the following sections:
+**IMPORTANT: You must create and save the output file to the correct location: `docs/DEV/LowLevelDesign_[FeatureName].md`**
+
+**CRITICAL INSTRUCTIONS:**
+1. **File Creation**: Generate the complete Low-Level Design document and save it as `docs/DEV/LowLevelDesign_[FeatureName].md`
+2. **File Path**: Ensure the file is created in the `docs/DEV/` directory
+3. **Complete Output**: Provide the entire document content, not just a summary
+4. **Format**: Use proper Markdown formatting with headers, tables, and code blocks
+5. **No Placeholders**: Fill in all sections with actual content based on the provided context
+
+Produce a complete file: `docs/DEV/LowLevelDesign_[FeatureName].md` with the following sections:
 
 ## 1. Executive Summary
 - **Module Overview**: Brief description of the module's purpose and scope
@@ -322,3 +327,14 @@ For each UI component:
 - Use this design as a direct blueprint for development implementation.
 
 ---
+
+## FINAL INSTRUCTION:
+
+**CRITICAL**: After generating the Low-Level Design content, you MUST:
+1. **Create the complete file** with all sections filled out
+2. **Save it to the correct path**: `docs/DEV/LowLevelDesign_[FeatureName].md`
+3. **Provide the full document content** in your response
+4. **Do not stop until the entire document is complete**
+5. **Include all required sections** with actual content, not placeholders
+
+**START CREATING THE FILE NOW: `docs/DEV/LowLevelDesign_[FeatureName].md`**

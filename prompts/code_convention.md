@@ -11,21 +11,24 @@ Your task is to create a comprehensive Code Convention and Standards document fo
 
 ## Dev Documentation (provided in full as context):
 
-- PRD_[FeatureName]_v1.0.md
-- SRS&DM_[FeatureName]_v1.0.md
-- US_[FeatureName]_v1.0.md
-- Vision_[FeatureName]_v1.0.md
 - TechStack.md
 - team-capabilities-file.md
-- Technical_Feasibility_[FeatureName].md
-- HighLevelDesign_[FeatureName].md (if available)
-- ExistingCodeConvention_[FeatureName].md (if available)
+- README.md (optional)
 
 ---
 
 ## Output Requirement
 
-Produce a file: `CodeConventionDocument_[FeatureName].md` with the following sections:
+**IMPORTANT: You must create and save the output file to the correct location: `docs/DEV/CodeConventionDocument_[FeatureName].md`**
+
+**CRITICAL INSTRUCTIONS:**
+1. **File Creation**: Generate the complete Code Convention document and save it as `docs/DEV/CodeConventionDocument_[FeatureName].md`
+2. **File Path**: Ensure the file is created in the `docs/DEV/` directory
+3. **Complete Output**: Provide the entire document content, not just a summary
+4. **Format**: Use proper Markdown formatting with headers, tables, and code examples
+5. **No Placeholders**: Fill in all sections with actual content based on the provided context
+
+Produce a complete file: `docs/DEV/CodeConventionDocument_[FeatureName].md` with the following sections:
 
 ### 1. Executive Summary
 - Technology stack overview and coding standards scope
@@ -101,3 +104,14 @@ Produce a file: `CodeConventionDocument_[FeatureName].md` with the following sec
 - Use this document for development team onboarding and code quality enforcement.
 
 ---
+
+## FINAL INSTRUCTION:
+
+**CRITICAL**: After generating the Code Convention document, you MUST:
+1. **Create the complete file** with all sections filled out
+2. **Save it to the correct path**: `docs/DEV/CodeConventionDocument_[FeatureName].md`
+3. **Provide the full document content** in your response
+4. **Do not stop until the entire document is complete**
+5. **Include all required sections** with actual content, not placeholders
+
+**START CREATING THE FILE NOW: `docs/DEV/CodeConventionDocument_[FeatureName].md`**

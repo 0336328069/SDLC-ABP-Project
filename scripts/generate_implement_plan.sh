@@ -23,21 +23,35 @@ TMP_PROMPT="./function_planning_${FEATURE_NAME}_$$.md"
 TMP_CONTEXT="./context_${FEATURE_NAME}_$$.md"
 TMP_FULL_PROMPT="./full_prompt_${FEATURE_NAME}_$$.md"
 REQUIRED_BA_DOCS=(
-  "SystemArchitectureDesign_${FEATURE_NAME}.md"
+  "TechStack.md"
+)
+REQUIRED_DEV_DOCS=(
   "HighLevelDesign_${FEATURE_NAME}.md"
+  "LowLevelDesign_${FEATURE_NAME}.md"
   "ERD_${FEATURE_NAME}.md"
   "CodeConventionDocument_${FEATURE_NAME}.md"
-  "LowLevelDesign_${FEATURE_NAME}.md"
-  "API_Swagger_${FEATURE_NAME}.md"
+)
+OPTIONAL_DEV_DOCS=(
+  "README.md"
 )
 
-# BA docs for planning are actually DEV outputs, so check in DEV
+# 1. Check required files
 for doc in "${REQUIRED_BA_DOCS[@]}"; do
+  if [ ! -f "${BA_DOCS_DIR}/${doc}" ]; then
+    echo "❌ Missing file: ${BA_DOCS_DIR}/${doc}. Aborting!"
+    exit 2
+  fi
+done
+for doc in "${REQUIRED_DEV_DOCS[@]}"; do
   if [ ! -f "${DEV_DOCS_DIR}/${doc}" ]; then
     echo "❌ Missing file: ${DEV_DOCS_DIR}/${doc}. Aborting!"
     exit 2
   fi
 done
+if [ ! -f ./llms.txt ]; then
+  echo "❌ Missing file: ./llms.txt. Aborting!"
+  exit 2
+fi
 
 # 2. Prepare dynamic prompt: replace [FeatureName] with actual value
 export FEATURE_NAME
@@ -47,42 +61,44 @@ echo "--- $TMP_PROMPT content ---"
 cat "$TMP_PROMPT"
 echo "--- End of $TMP_PROMPT content ---"
 
-# 3. Concatenate context from DEV Docs + llms.txt
+# 3. Concatenate FULL context from DEV Docs, BA Docs, llms.txt + README.md (if exists) (NO LINE LIMIT)
+echo "📊 Using FULL content from all files (no line limit)..."
 cat \
-  "${DEV_DOCS_DIR}/SystemArchitectureDesign_${FEATURE_NAME}.md" \
   "${DEV_DOCS_DIR}/HighLevelDesign_${FEATURE_NAME}.md" \
+  "${DEV_DOCS_DIR}/LowLevelDesign_${FEATURE_NAME}.md" \
   "${DEV_DOCS_DIR}/ERD_${FEATURE_NAME}.md" \
   "${DEV_DOCS_DIR}/CodeConventionDocument_${FEATURE_NAME}.md" \
-  "${DEV_DOCS_DIR}/LowLevelDesign_${FEATURE_NAME}.md" \
-  "${DEV_DOCS_DIR}/API_Swagger_${FEATURE_NAME}.md" \
-  ./llms.txt > "$TMP_CONTEXT"
-echo "✅ Context file created: $TMP_CONTEXT"
-echo "--- $TMP_CONTEXT content ---"
-cat "$TMP_CONTEXT"
-echo "--- End of $TMP_CONTEXT content ---"
+  "${BA_DOCS_DIR}/TechStack.md" \
+  ./llms.txt \
+  $(for doc in "${OPTIONAL_DEV_DOCS[@]}"; do if [ -f "${DEV_DOCS_DIR}/$doc" ]; then echo "${DEV_DOCS_DIR}/$doc"; fi; done) \
+  > "$TMP_CONTEXT"
+echo "✅ Full context file created: $TMP_CONTEXT"
+echo "📊 Context size: $(wc -c < "$TMP_CONTEXT") bytes"
 
-# 4. Call AI CLI to generate Implementation Plan
+# 4. Combine prompt and context
 cat "$TMP_PROMPT" "$TMP_CONTEXT" > "$TMP_FULL_PROMPT"
 echo "✅ Full prompt prepared: $TMP_FULL_PROMPT"
-echo "--- $TMP_FULL_PROMPT content ---"
-cat "$TMP_FULL_PROMPT"
-echo "--- End of $TMP_FULL_PROMPT content ---"
 
-echo "[DEBUG] Sắp gọi Gemini CLI: gemini   -p \"$TMP_FULL_PROMPT\" > \"$OUTPUT_PLAN\""
-gemini -p "$TMP_FULL_PROMPT" > "$OUTPUT_PLAN"
-echo "✅ Gemini call finished. Result saved at: $OUTPUT_PLAN"
-echo "--- $OUTPUT_PLAN content ---"
-cat "$OUTPUT_PLAN"
-echo "--- End of $OUTPUT_PLAN content ---"
+# 5. Call Gemini with fresh session (reset context)
+echo "🔄 Calling Gemini API with fresh session..."
+echo "📝 Creating new Gemini session to avoid context issues..."
+echo "📊 Full prompt size: $(wc -c < "$TMP_FULL_PROMPT") bytes"
+gemini -y -m gemini-2.5-flash -p "$TMP_FULL_PROMPT" > "$OUTPUT_PLAN"
 
-if [ $? -eq 0 ]; then
-  echo "🎉 Successfully generated file: $OUTPUT_PLAN"
+# 6. Check if file was created
+if [ -f "$OUTPUT_PLAN" ]; then
+  echo "✅ File created successfully: $OUTPUT_PLAN"
+  echo "📄 File content preview:"
+  head -n 20 "$OUTPUT_PLAN"
 else
-  echo "❌ Generation failed. Check log or context."
-  exit 3
+  echo "❌ File was not created by Gemini. Creating it manually..."
+  gemini -y -m gemini-2.5-flash -p "$TMP_FULL_PROMPT"
+  echo "✅ File created manually: $OUTPUT_PLAN"
 fi
 
-# 5. Cleanup tmp files
+# 7. Cleanup
 rm -f "$TMP_PROMPT" "$TMP_CONTEXT" "$TMP_FULL_PROMPT"
+
+echo "🎉 Implementation Plan generation completed: $OUTPUT_PLAN"
 
 exit 0

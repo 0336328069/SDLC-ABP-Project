@@ -23,28 +23,20 @@ TMP_PROMPT="./api_swagger_${FEATURE_NAME}_$$.md"
 TMP_CONTEXT="./context_api_swagger_${FEATURE_NAME}_$$.md"
 TMP_FULL_PROMPT="./full_prompt_api_swagger_${FEATURE_NAME}_$$.md"
 REQUIRED_BA_DOCS=(
-  "PRD_${FEATURE_NAME}_v1.0.md"
-  "SRS&DM_${FEATURE_NAME}_v1.0.md"
-  "US_${FEATURE_NAME}_v1.0.md"
-  "Vision_${FEATURE_NAME}_v1.0.md"
   "TechStack.md"
-  "team-capabilities-file.md"
 )
 REQUIRED_DEV_DOCS=(
-  "Technical_Feasibility_${FEATURE_NAME}.md"
-  "HighLevelDesign_${FEATURE_NAME}.md"
-  "ERD_${FEATURE_NAME}.md"
+  "CodeConventionDocument_${FEATURE_NAME}.md"
   "LowLevelDesign_${FEATURE_NAME}.md"
 )
 
-echo "🔍 Checking BA Docs for feature: $FEATURE_NAME ..."
+# 2. Check required files
 for doc in "${REQUIRED_BA_DOCS[@]}"; do
   if [ ! -f "${BA_DOCS_DIR}/${doc}" ]; then
     echo "❌ Missing file: ${BA_DOCS_DIR}/${doc}. Aborting!"
     exit 2
   fi
 done
-echo "🔍 Checking DEV Docs for feature: $FEATURE_NAME ..."
 for doc in "${REQUIRED_DEV_DOCS[@]}"; do
   if [ ! -f "${DEV_DOCS_DIR}/${doc}" ]; then
     echo "❌ Missing file: ${DEV_DOCS_DIR}/${doc}. Aborting!"
@@ -52,7 +44,7 @@ for doc in "${REQUIRED_DEV_DOCS[@]}"; do
   fi
 done
 
-# 2. Prepare dynamic prompt: replace [FeatureName] with actual value
+# 3. Prepare dynamic prompt: replace [FeatureName] with actual value
 export FEATURE_NAME
 envsubst < "$PROMPT_TEMPLATE" > "$TMP_PROMPT"
 echo "✅ Dynamic prompt created: $TMP_PROMPT"
@@ -60,45 +52,41 @@ echo "--- $TMP_PROMPT content ---"
 cat "$TMP_PROMPT"
 echo "--- End of $TMP_PROMPT content ---"
 
-# 3. Concatenate context from BA Docs, DEV Docs + llms.txt
+# 4. Concatenate FULL context from BA Docs, DEV Docs + llms.txt (NO LINE LIMIT)
+echo "📊 Using FULL content from all files (no line limit)..."
 cat \
-  "${BA_DOCS_DIR}/PRD_${FEATURE_NAME}_v1.0.md" \
-  "${BA_DOCS_DIR}/SRS&DM_${FEATURE_NAME}_v1.0.md" \
-  "${BA_DOCS_DIR}/US_${FEATURE_NAME}_v1.0.md" \
-  "${BA_DOCS_DIR}/Vision_${FEATURE_NAME}_v1.0.md" \
   "${BA_DOCS_DIR}/TechStack.md" \
-  "${BA_DOCS_DIR}/team-capabilities-file.md" \
-  "${DEV_DOCS_DIR}/Technical_Feasibility_${FEATURE_NAME}.md" \
-  "${DEV_DOCS_DIR}/HighLevelDesign_${FEATURE_NAME}.md" \
-  "${DEV_DOCS_DIR}/ERD_${FEATURE_NAME}.md" \
+  "${DEV_DOCS_DIR}/CodeConventionDocument_${FEATURE_NAME}.md" \
   "${DEV_DOCS_DIR}/LowLevelDesign_${FEATURE_NAME}.md" \
   ./llms.txt > "$TMP_CONTEXT"
-echo "✅ Context file created: $TMP_CONTEXT"
-echo "--- $TMP_CONTEXT content ---"
-cat "$TMP_CONTEXT"
-echo "--- End of $TMP_CONTEXT content ---"
+echo "✅ Full context file created: $TMP_CONTEXT"
+echo "📊 Context size: $(wc -c < "$TMP_CONTEXT") bytes"
 
-# 4. Call AI CLI to generate API Swagger YAML
+# 5. Combine prompt and context
 cat "$TMP_PROMPT" "$TMP_CONTEXT" > "$TMP_FULL_PROMPT"
 echo "✅ Full prompt prepared: $TMP_FULL_PROMPT"
-echo "--- $TMP_FULL_PROMPT content ---"
-cat "$TMP_FULL_PROMPT"
-echo "--- End of $TMP_FULL_PROMPT content ---"
 
-gemini -p "$TMP_FULL_PROMPT" > "$OUTPUT_API_SWAGGER"
-echo "✅ Gemini call finished. Result saved at: $OUTPUT_API_SWAGGER"
-echo "--- $OUTPUT_API_SWAGGER content ---"
-cat "$OUTPUT_API_SWAGGER"
-echo "--- End of $OUTPUT_API_SWAGGER content ---"
+# 6. Call Gemini with fresh session (reset context)
+echo "🔄 Calling Gemini API with fresh session..."
+echo "📝 Creating new Gemini session to avoid context issues..."
+echo "📊 Full prompt size: $(wc -c < "$TMP_FULL_PROMPT") bytes"
+gemini -y -m gemini-2.5-flash -p "$TMP_FULL_PROMPT" > "$OUTPUT_API_SWAGGER"
 
-if [ $? -eq 0 ]; then
-  echo "🎉 Successfully generated file: $OUTPUT_API_SWAGGER"
+# 7. Check result
+if [ -s "$OUTPUT_API_SWAGGER" ]; then
+  echo "✅ Gemini call completed successfully!"
+  echo "📄 Generated file: $OUTPUT_API_SWAGGER"
+  echo "📊 File size: $(wc -c < "$OUTPUT_API_SWAGGER") bytes"
+  echo "📄 Content preview:"
+  head -n 20 "$OUTPUT_API_SWAGGER"
 else
-  echo "❌ Generation failed. Check log or context."
+  echo "❌ Gemini call failed or produced empty output."
   exit 3
 fi
 
-# 5. Cleanup tmp files
+# 8. Cleanup
 rm -f "$TMP_PROMPT" "$TMP_CONTEXT" "$TMP_FULL_PROMPT"
+
+echo "🎉 API Swagger generation completed: $OUTPUT_API_SWAGGER"
 
 exit 0 

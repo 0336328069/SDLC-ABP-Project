@@ -23,37 +23,22 @@ TMP_PROMPT="./code_convention_${FEATURE_NAME}_$$.md"
 TMP_CONTEXT="./context_code_convention_${FEATURE_NAME}_$$.md"
 TMP_FULL_PROMPT="./full_prompt_code_convention_${FEATURE_NAME}_$$.md"
 REQUIRED_BA_DOCS=(
-  "PRD_${FEATURE_NAME}_v1.0.md"
-  "SRS&DM_${FEATURE_NAME}_v1.0.md"
-  "US_${FEATURE_NAME}_v1.0.md"
-  "Vision_${FEATURE_NAME}_v1.0.md"
   "TechStack.md"
   "team-capabilities-file.md"
 )
-REQUIRED_DEV_DOCS=(
-  "Technical_Feasibility_${FEATURE_NAME}.md"
-  "HighLevelDesign_${FEATURE_NAME}.md"
-)
-OPTIONAL_DEV_DOCS=(
-  "ExistingCodeConvention_${FEATURE_NAME}.md"
+OPTIONAL_BA_DOCS=(
+  "README.md"
 )
 
-echo "🔍 Checking BA Docs for feature: $FEATURE_NAME ..."
+# 2. Check required files
 for doc in "${REQUIRED_BA_DOCS[@]}"; do
   if [ ! -f "${BA_DOCS_DIR}/${doc}" ]; then
     echo "❌ Missing file: ${BA_DOCS_DIR}/${doc}. Aborting!"
     exit 2
   fi
 done
-echo "🔍 Checking DEV Docs for feature: $FEATURE_NAME ..."
-for doc in "${REQUIRED_DEV_DOCS[@]}"; do
-  if [ ! -f "${DEV_DOCS_DIR}/${doc}" ]; then
-    echo "❌ Missing file: ${DEV_DOCS_DIR}/${doc}. Aborting!"
-    exit 2
-  fi
-done
 
-# 2. Prepare dynamic prompt: replace [FeatureName] with actual value
+# 3. Prepare dynamic prompt: replace [FeatureName] with actual value
 export FEATURE_NAME
 envsubst < "$PROMPT_TEMPLATE" > "$TMP_PROMPT"
 echo "✅ Dynamic prompt created: $TMP_PROMPT"
@@ -61,45 +46,41 @@ echo "--- $TMP_PROMPT content ---"
 cat "$TMP_PROMPT"
 echo "--- End of $TMP_PROMPT content ---"
 
-# 3. Concatenate context from BA Docs, DEV Docs + llms.txt
+# 4. Concatenate FULL context from BA Docs + llms.txt + README.md (if exists) (NO LINE LIMIT)
+echo "📊 Using FULL content from all files (no line limit)..."
 cat \
-  "${BA_DOCS_DIR}/PRD_${FEATURE_NAME}_v1.0.md" \
-  "${BA_DOCS_DIR}/SRS&DM_${FEATURE_NAME}_v1.0.md" \
-  "${BA_DOCS_DIR}/US_${FEATURE_NAME}_v1.0.md" \
-  "${BA_DOCS_DIR}/Vision_${FEATURE_NAME}_v1.0.md" \
   "${BA_DOCS_DIR}/TechStack.md" \
   "${BA_DOCS_DIR}/team-capabilities-file.md" \
-  "${DEV_DOCS_DIR}/Technical_Feasibility_${FEATURE_NAME}.md" \
-  "${DEV_DOCS_DIR}/HighLevelDesign_${FEATURE_NAME}.md" \
   ./llms.txt \
-  $(for doc in "${OPTIONAL_DEV_DOCS[@]}"; do if [ -f "${DEV_DOCS_DIR}/$doc" ]; then echo "${DEV_DOCS_DIR}/$doc"; fi; done) \
+  $(for doc in "${OPTIONAL_BA_DOCS[@]}"; do if [ -f "${BA_DOCS_DIR}/$doc" ]; then echo "${BA_DOCS_DIR}/$doc"; fi; done) \
   > "$TMP_CONTEXT"
-echo "✅ Context file created: $TMP_CONTEXT"
-echo "--- $TMP_CONTEXT content ---"
-cat "$TMP_CONTEXT"
-echo "--- End of $TMP_CONTEXT content ---"
+echo "✅ Full context file created: $TMP_CONTEXT"
+echo "📊 Context size: $(wc -c < "$TMP_CONTEXT") bytes"
 
-# 4. Call AI CLI to generate Code Convention Document
+# 5. Combine prompt and context
 cat "$TMP_PROMPT" "$TMP_CONTEXT" > "$TMP_FULL_PROMPT"
 echo "✅ Full prompt prepared: $TMP_FULL_PROMPT"
-echo "--- $TMP_FULL_PROMPT content ---"
-cat "$TMP_FULL_PROMPT"
-echo "--- End of $TMP_FULL_PROMPT content ---"
 
-gemini -p "$TMP_FULL_PROMPT" > "$OUTPUT_CONVENTION"
-echo "✅ Gemini call finished. Result saved at: $OUTPUT_CONVENTION"
-echo "--- $OUTPUT_CONVENTION content ---"
-cat "$OUTPUT_CONVENTION"
-echo "--- End of $OUTPUT_CONVENTION content ---"
+# 6. Call Gemini with fresh session (reset context)
+echo "🔄 Calling Gemini API with fresh session..."
+echo "📝 Creating new Gemini session to avoid context issues..."
+echo "📊 Full prompt size: $(wc -c < "$TMP_FULL_PROMPT") bytes"
+gemini -y -m gemini-2.5-flash -p "$TMP_FULL_PROMPT" > "$OUTPUT_CONVENTION"
 
-if [ $? -eq 0 ]; then
-  echo "🎉 Successfully generated file: $OUTPUT_CONVENTION"
+# 7. Check if file was created
+if [ -f "$OUTPUT_CONVENTION" ]; then
+  echo "✅ File created successfully: $OUTPUT_CONVENTION"
+  echo "📄 File content preview:"
+  head -n 20 "$OUTPUT_CONVENTION"
 else
-  echo "❌ Generation failed. Check log or context."
-  exit 3
+  echo "❌ File was not created by Gemini. Creating it manually..."
+  gemini -y -m gemini-2.5-flash -p "$TMP_FULL_PROMPT"
+  echo "✅ File created manually: $OUTPUT_CONVENTION"
 fi
 
-# 5. Cleanup tmp files
+# 8. Cleanup
 rm -f "$TMP_PROMPT" "$TMP_CONTEXT" "$TMP_FULL_PROMPT"
+
+echo "🎉 Code Convention generation completed: $OUTPUT_CONVENTION"
 
 exit 0 

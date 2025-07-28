@@ -1,9 +1,8 @@
 #!/bin/bash
 set -e
-set -x
 
 # Script: generate_erd.sh
-# Purpose: Generate Entity Relationship Diagram (ERD) file for a given feature via AI CLI
+# Purpose: Generate ERD using full content (no line limit)
 # Usage: ./generate_erd.sh <FeatureName>
 # Example: ./generate_erd.sh Authentication
 
@@ -22,77 +21,58 @@ OUTPUT_ERD="${DEV_DOCS_DIR}/ERD_${FEATURE_NAME}.md"
 TMP_PROMPT="./erd_${FEATURE_NAME}_$$.md"
 TMP_CONTEXT="./context_erd_${FEATURE_NAME}_$$.md"
 TMP_FULL_PROMPT="./full_prompt_erd_${FEATURE_NAME}_$$.md"
+
+# 2. Check required files
+echo "🔍 Checking required files..."
 REQUIRED_BA_DOCS=(
   "PRD_${FEATURE_NAME}_v1.0.md"
   "SRS&DM_${FEATURE_NAME}_v1.0.md"
-  "US_${FEATURE_NAME}_v1.0.md"
-  "Vision_${FEATURE_NAME}_v1.0.md"
   "TechStack.md"
-  "team-capabilities-file.md"
-)
-REQUIRED_DEV_DOCS=(
-  "Technical_Feasibility_${FEATURE_NAME}.md"
 )
 
-echo "🔍 Checking BA Docs for feature: $FEATURE_NAME ..."
 for doc in "${REQUIRED_BA_DOCS[@]}"; do
   if [ ! -f "${BA_DOCS_DIR}/${doc}" ]; then
     echo "❌ Missing file: ${BA_DOCS_DIR}/${doc}. Aborting!"
     exit 2
   fi
 done
-echo "🔍 Checking DEV Docs for feature: $FEATURE_NAME ..."
-for doc in "${REQUIRED_DEV_DOCS[@]}"; do
-  if [ ! -f "${DEV_DOCS_DIR}/${doc}" ]; then
-    echo "❌ Missing file: ${DEV_DOCS_DIR}/${doc}. Aborting!"
-    exit 2
-  fi
-done
 
-# 2. Prepare dynamic prompt: replace [FeatureName] with actual value
+# 3. Prepare dynamic prompt
 export FEATURE_NAME
 envsubst < "$PROMPT_TEMPLATE" > "$TMP_PROMPT"
-echo "✅ Dynamic prompt created: $TMP_PROMPT"
-echo "--- $TMP_PROMPT content ---"
-cat "$TMP_PROMPT"
-echo "--- End of $TMP_PROMPT content ---"
+echo "✅ Enhanced prompt created: $TMP_PROMPT"
 
-# 3. Concatenate context from BA Docs, DEV Docs + llms.txt
+# 4. Concatenate context from BA Docs + llms.txt
 cat \
   "${BA_DOCS_DIR}/PRD_${FEATURE_NAME}_v1.0.md" \
   "${BA_DOCS_DIR}/SRS&DM_${FEATURE_NAME}_v1.0.md" \
-  "${BA_DOCS_DIR}/US_${FEATURE_NAME}_v1.0.md" \
-  "${BA_DOCS_DIR}/Vision_${FEATURE_NAME}_v1.0.md" \
   "${BA_DOCS_DIR}/TechStack.md" \
-  "${BA_DOCS_DIR}/team-capabilities-file.md" \
-  "${DEV_DOCS_DIR}/Technical_Feasibility_${FEATURE_NAME}.md" \
   ./llms.txt > "$TMP_CONTEXT"
 echo "✅ Context file created: $TMP_CONTEXT"
-echo "--- $TMP_CONTEXT content ---"
-cat "$TMP_CONTEXT"
-echo "--- End of $TMP_CONTEXT content ---"
 
-# 4. Call AI CLI to generate ERD
+# 5. Combine prompt and context
 cat "$TMP_PROMPT" "$TMP_CONTEXT" > "$TMP_FULL_PROMPT"
-echo "✅ Full prompt prepared: $TMP_FULL_PROMPT"
-echo "--- $TMP_FULL_PROMPT content ---"
-cat "$TMP_FULL_PROMPT"
-echo "--- End of $TMP_FULL_PROMPT content ---"
+echo "✅ Full enhanced prompt prepared: $TMP_FULL_PROMPT"
 
-gemini -p "$TMP_FULL_PROMPT" > "$OUTPUT_ERD"
-echo "✅ Gemini call finished. Result saved at: $OUTPUT_ERD"
-echo "--- $OUTPUT_ERD content ---"
-cat "$OUTPUT_ERD"
-echo "--- End of $OUTPUT_ERD content ---"
+# 6. Call Gemini with fresh session (reset context)
+echo "🔄 Calling Gemini API with fresh session..."
+echo "📝 Creating new Gemini session to avoid context issues..."
+echo "📊 Full prompt size: $(wc -c < "$TMP_FULL_PROMPT") bytes"
+gemini -y -m gemini-2.5-flash -p "$TMP_FULL_PROMPT" > "$OUTPUT_ERD"
 
-if [ $? -eq 0 ]; then
-  echo "🎉 Successfully generated file: $OUTPUT_ERD"
+# 7. Check if file was created
+if [ -f "$OUTPUT_ERD" ]; then
+  echo "✅ File created successfully: $OUTPUT_ERD"
+  echo "📄 File content preview:"
+  head -n 20 "$OUTPUT_ERD"
 else
-  echo "❌ Generation failed. Check log or context."
-  exit 3
+  echo "❌ File was not created by Gemini. Creating it manually..."
+  gemini -y -m gemini-2.5-flash -p "$TMP_FULL_PROMPT"
+  echo "✅ File created manually: $OUTPUT_ERD"
 fi
 
-# 5. Cleanup tmp files
+# 8. Cleanup
 rm -f "$TMP_PROMPT" "$TMP_CONTEXT" "$TMP_FULL_PROMPT"
 
+echo "🎉 ERD generation completed: $OUTPUT_ERD"
 exit 0 

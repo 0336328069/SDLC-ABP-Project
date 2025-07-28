@@ -13,10 +13,7 @@ Your task is to design a comprehensive, actionable enterprise system architectur
 
 - PRD_[FeatureName]_v1.0.md
 - SRS&DM_[FeatureName]_v1.0.md
-- US_[FeatureName]_v1.0.md
-- Vision_[FeatureName]_v1.0.md
 - TechStack.md
-- team-capabilities-file.md
 - Technical_Feasibility_[FeatureName].md
 
 > *(All contents are provided in full after this prompt.  Use only facts, requirements, and conventions found in these documents.  
@@ -26,7 +23,16 @@ If any file/section is missing or empty, list it as “TBD: [detail]”. Never a
 
 ## Output Requirement
 
-Produce a markdown file `System_Architecture_Design_[FeatureName].md` with all required architecture and security sections. Use only the information in the above documents; list **TBD: [missing detail]** for anything missing.
+**IMPORTANT: You must create and save the output file to the correct location: `docs/DEV/System_Architecture_Design_[FeatureName].md`**
+
+**CRITICAL INSTRUCTIONS:**
+1. **File Creation**: Generate the complete System Architecture Design document and save it as `docs/DEV/System_Architecture_Design_[FeatureName].md`
+2. **File Path**: Ensure the file is created in the `docs/DEV/` directory
+3. **Complete Output**: Provide the entire document content, not just a summary
+4. **Format**: Use proper Markdown formatting with headers, tables, and diagrams
+5. **No Placeholders**: Fill in all sections with actual content based on the provided context
+
+Produce a complete file: `docs/DEV/System_Architecture_Design_[FeatureName].md` with all required architecture and security sections. Use only the information in the above documents; list **TBD: [missing detail]** for anything missing.
 
 ---
 
@@ -133,5 +139,18 @@ Produce a markdown file `System_Architecture_Design_[FeatureName].md` with all r
 - **Security must be integrated throughout all sections.**
 - **Start your output as a markdown document with header `# System Architecture Design: [<domain> or <feature>]` and follow the output format strictly.**
 - **DO NOT append any conversational commentary, questions, or LLM/system output blocks—just the markdown structure above.**
+
+---
+
+## FINAL INSTRUCTION:
+
+**CRITICAL**: After generating the System Architecture Design content, you MUST:
+1. **Create the complete file** with all sections filled out
+2. **Save it to the correct path**: `docs/DEV/System_Architecture_Design_[FeatureName].md`
+3. **Provide the full document content** in your response
+4. **Do not stop until the entire document is complete**
+5. **Include all required sections** with actual content, not placeholders
+
+**START CREATING THE FILE NOW: `docs/DEV/System_Architecture_Design_[FeatureName].md`**
 
 ---

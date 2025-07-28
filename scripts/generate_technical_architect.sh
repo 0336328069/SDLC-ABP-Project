@@ -26,10 +26,7 @@ TMP_FULL_PROMPT="./full_prompt_technical_architect_${FEATURE_NAME}_$$.md"
 REQUIRED_BA_DOCS=(
   "PRD_${FEATURE_NAME}_v1.0.md"
   "SRS&DM_${FEATURE_NAME}_v1.0.md"
-  "US_${FEATURE_NAME}_v1.0.md"
-  "Vision_${FEATURE_NAME}_v1.0.md"
   "TechStack.md"
-  "team-capabilities-file.md"
 )
 REQUIRED_DEV_DOCS=(
   "Technical_Feasibility_${FEATURE_NAME}.md"
@@ -62,29 +59,37 @@ envsubst < "$PROMPT_TEMPLATE" > "$TMP_PROMPT"
 echo "✅ Prompt động đã tạo: $TMP_PROMPT"
 cat "$TMP_PROMPT"
 
-# 4. Ghép context các file input
+# 4. Concatenate FULL context from BA Docs + llms.txt (NO LINE LIMIT)
+echo "📊 Using FULL content from all files (no line limit)..."
 cat ${CONTEXT_FILES[@]} > "$TMP_CONTEXT"
-echo "✅ Context file đã tạo: $TMP_CONTEXT"
-cat "$TMP_CONTEXT"
+echo "✅ Full context file created: $TMP_CONTEXT"
+echo "📊 Context size: $(wc -c < "$TMP_CONTEXT") bytes"
 
-# 5. Gọi AI CLI để sinh file System Architecture Design
+# 5. Combine prompt and context
 cat "$TMP_PROMPT" "$TMP_CONTEXT" > "$TMP_FULL_PROMPT"
-echo "✅ Đã ghép full prompt: $TMP_FULL_PROMPT"
-cat "$TMP_FULL_PROMPT"
+echo "✅ Full prompt prepared: $TMP_FULL_PROMPT"
 
-echo "[DEBUG] Sắp gọi Gemini CLI: gemini -p \"$TMP_FULL_PROMPT\" > \"$OUTPUT_FILE\""
-gemini -p "$TMP_FULL_PROMPT" > "$OUTPUT_FILE"
-echo "✅ Đã gọi gemini xong. Kết quả lưu ở: $OUTPUT_FILE"
-cat "$OUTPUT_FILE"
+# 6. Call Gemini with fresh session (reset context)
+echo "🔄 Calling Gemini API with fresh session..."
+echo "📝 Creating new Gemini session to avoid context issues..."
+echo "📊 Full prompt size: $(wc -c < "$TMP_FULL_PROMPT") bytes"
+gemini -y -m gemini-2.5-flash -p "$TMP_FULL_PROMPT" > "$OUTPUT_FILE"
 
-if [ $? -eq 0 ]; then
-  echo "🎉 Đã sinh thành công file: $OUTPUT_FILE"
+# 7. Check result
+if [ -s "$OUTPUT_FILE" ]; then
+  echo "✅ Gemini call completed successfully!"
+  echo "📄 Generated file: $OUTPUT_FILE"
+  echo "📊 File size: $(wc -c < "$OUTPUT_FILE") bytes"
+  echo "📄 Content preview:"
+  head -n 20 "$OUTPUT_FILE"
 else
-  echo "❌ Sinh file thất bại. Xem lại log hoặc context."
+  echo "❌ Gemini call failed or produced empty output."
   exit 3
 fi
 
-# 6. Cleanup tmp nếu muốn
+# 8. Cleanup
 rm -f "$TMP_PROMPT" "$TMP_CONTEXT" "$TMP_FULL_PROMPT"
+
+echo "🎉 Technical Architecture generation completed: $OUTPUT_FILE"
 
 exit 0 

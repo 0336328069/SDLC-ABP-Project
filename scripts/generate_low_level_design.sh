@@ -89,7 +89,7 @@ else
 fi
 
 # 8. Cleanup
-# rm -f "$TMP_PROMPT" "$TMP_CONTEXT" "$TMP_FULL_PROMPT"
+rm -f "$TMP_PROMPT" "$TMP_CONTEXT" "$TMP_FULL_PROMPT"
 
 echo "🎉 Low-Level Design generation completed: $OUTPUT_LLD"
 

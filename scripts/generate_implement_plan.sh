@@ -61,18 +61,27 @@ echo "--- $TMP_PROMPT content ---"
 cat "$TMP_PROMPT"
 echo "--- End of $TMP_PROMPT content ---"
 
-# 3. Concatenate FULL context from DEV Docs, BA Docs, llms.txt + README.md (if exists) (NO LINE LIMIT)
-echo "📊 Using FULL content from all files (no line limit)..."
-cat \
-  "${DEV_DOCS_DIR}/HighLevelDesign_${FEATURE_NAME}.md" \
-  "${DEV_DOCS_DIR}/LowLevelDesign_${FEATURE_NAME}.md" \
-  "${DEV_DOCS_DIR}/ERD_${FEATURE_NAME}.md" \
-  "${DEV_DOCS_DIR}/CodeConventionDocument_${FEATURE_NAME}.md" \
-  "${BA_DOCS_DIR}/TechStack.md" \
-  ./llms.txt \
-  $(for doc in "${OPTIONAL_DEV_DOCS[@]}"; do if [ -f "${DEV_DOCS_DIR}/$doc" ]; then echo "${DEV_DOCS_DIR}/$doc"; fi; done) \
-  > "$TMP_CONTEXT"
-echo "✅ Full context file created: $TMP_CONTEXT"
+# 3. Concatenate OPTIMIZED context (first 300 lines of each file to reduce size)
+echo "📊 Using OPTIMIZED content (first 300 lines per file) to reduce input size..."
+head -n 300 "${DEV_DOCS_DIR}/HighLevelDesign_${FEATURE_NAME}.md" > "$TMP_CONTEXT"
+echo -e "\n\n=== LowLevelDesign Content ===" >> "$TMP_CONTEXT"
+head -n 300 "${DEV_DOCS_DIR}/LowLevelDesign_${FEATURE_NAME}.md" >> "$TMP_CONTEXT"
+echo -e "\n\n=== ERD Content ===" >> "$TMP_CONTEXT"
+head -n 300 "${DEV_DOCS_DIR}/ERD_${FEATURE_NAME}.md" >> "$TMP_CONTEXT"
+echo -e "\n\n=== CodeConvention Content ===" >> "$TMP_CONTEXT"
+head -n 300 "${DEV_DOCS_DIR}/CodeConventionDocument_${FEATURE_NAME}.md" >> "$TMP_CONTEXT"
+echo -e "\n\n=== TechStack Content ===" >> "$TMP_CONTEXT"
+head -n 300 "${BA_DOCS_DIR}/TechStack.md" >> "$TMP_CONTEXT"
+echo -e "\n\n=== LLMs Content ===" >> "$TMP_CONTEXT"
+head -n 100 ./llms.txt >> "$TMP_CONTEXT"
+
+# Add README.md if exists (optional)
+if [ -f "${DEV_DOCS_DIR}/README.md" ]; then
+  echo -e "\n\n=== README Content ===" >> "$TMP_CONTEXT"
+  head -n 200 "${DEV_DOCS_DIR}/README.md" >> "$TMP_CONTEXT"
+fi
+
+echo "✅ Optimized context file created: $TMP_CONTEXT"
 echo "📊 Context size: $(wc -c < "$TMP_CONTEXT") bytes"
 
 # 4. Combine prompt and context
@@ -82,7 +91,7 @@ echo "✅ Full prompt prepared: $TMP_FULL_PROMPT"
 # 5. Call Gemini with fresh session (reset context)
 echo "🔄 Calling Gemini API with fresh session..."
 echo "📝 Creating new Gemini session to avoid context issues..."
-echo "📊 Full prompt size: $(wc -c < "$TMP_FULL_PROMPT") bytes"
+echo "📊 Optimized prompt size: $(wc -c < "$TMP_FULL_PROMPT") bytes"
 gemini -y -m gemini-2.5-flash -p "$TMP_FULL_PROMPT" > "$OUTPUT_PLAN"
 
 # 6. Check if file was created

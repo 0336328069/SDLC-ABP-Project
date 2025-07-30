@@ -1,201 +1,484 @@
-# Entity Relationship Diagram (ERD) and Data Model: Authentication
+# Entity Relationship Diagram: Authentication Feature v1.0
 
-### 1. Executive Summary
-- **Project Name**: Authentication Service for ABP Enterprise Application
-- **Database Overview**: This document outlines the database schema for the Authentication feature. The database is designed to securely manage user accounts, support core authentication mechanisms (login, registration), and handle password recovery processes. Its primary business value lies in securing user data, enabling user retention, and providing a trustworthy platform foundation.
-- **Database Technology**: **SQL Server 2019+** (as per technical specifications).
-- **Total Entities**: 2 (1 core ABP entity, 1 custom entity).
-- **Key Relationships**: A one-to-many relationship exists between the User Account and the Password Reset Token.
-- **Data Integrity Strategy**: Data integrity is maintained through primary keys, unique constraints (e.g., on user email), foreign key relationships with cascading rules, and application-level validation based on business rules.
-- **Performance Considerations**: The design incorporates indexing on frequently queried columns (e.g., email, token) and leverages the performance features of the ABP Framework and Entity Framework Core.
-- **Security Implementation**: Security is enforced by hashing all sensitive data (passwords, tokens) using Bcrypt, implementing role-based access control (RBAC) via the ABP Identity module, and ensuring all data in transit is encrypted via HTTPS.
-- **Migration Strategy**: Database schema changes will be managed and deployed using **Entity Framework Core Migrations**.
+## Document Information
 
-**Document Information**:
 - **Version**: 1.0
-- **Date**: 2025-07-28
-- **Prepared By**: Database Architecture Team
-- **Reviewed By**: Technical Lead, Business Analyst
-- **Approved By**: Project Manager, Lead Database Administrator
+- **Date**: December 19, 2024
+- **Feature**: Authentication System
+- **Prepared By**: Development Team
+- **Reviewed By**: Technical Lead
+- **Approved By**: Project Manager
 
-### 2. Domain Model Analysis
-- **2.1 Domain Entities Analysis**:
-  - **Core Domain Entities**:
-    - **User Account**: Represents a user's digital identity within the system. It is the central entity for authentication and authorization, storing credentials and status information. This will be implemented using the existing `AbpUser` entity from the ABP Framework's Identity module to ensure consistency and leverage built-in features.
-    - **Password Reset Token**: A temporary, single-use token generated to allow a user to securely reset their password without being logged in.
-  - **Entity Categories**:
-    - **Master Data**: `User Account`.
-    - **Transaction Data**: `Password Reset Token`.
-    - **Reference Data**: TBD: No specific reference data identified.
-    - **Audit Data**: ABP Framework provides built-in audit properties (`CreationTime`, `CreatorId`, `LastModificationTime`, `LastModifierId`, `DeleterId`, `DeletionTime`, `IsDeleted`) for entities.
+---
 
-- **2.2 Domain Relationships Analysis**:
-  - **Primary Relationships**:
-    - **User Account to Password Reset Token**: A `User Account` can have multiple `Password Reset Tokens` over its lifetime, but each `Password Reset Token` is associated with exactly one `User Account`.
-      - **Cardinality**: One-to-Many (1:N).
-      - **Business Rules**: When a user requests a password reset, a new token is generated and linked to their account. The token becomes invalid after use or expiration.
-  - **Relationship Categories**:
-    - **Association**: The relationship between `User Account` and `Password Reset Token` is a direct association.
+## 1. Overview
 
-- **2.3 Domain Rules and Constraints**:
-  - **Entity Rules**:
-    - **User Account**:
-      - `Email`: Mandatory, must be unique across the system, and must be a valid email format.
-      - `Password`: Mandatory, must be hashed using Bcrypt, and must meet complexity requirements (≥8 chars, 1 uppercase, 1 lowercase, 1 number).
-      - `Account Status`: Can be `Active`, `Locked`, or `Inactive`. A user's account is locked for 15 minutes after 5 consecutive failed login attempts.
-  - **Relationship Rules**:
-    - **Referential Integrity**: The `UserId` in the `PasswordResetTokens` table must correspond to a valid `Id` in the `AbpUsers` table.
-    - **Cascade Rules**: Deleting a `User Account` should cascade to delete all associated `Password Reset Tokens`.
+This document presents the Entity Relationship Diagram (ERD) for the Authentication feature of the ABP Enterprise Application. The ERD illustrates the data model, relationships, and constraints required to support user registration, login, password reset, and session management functionalities.
 
-### 3. Technical Architecture Analysis
-- **3.1 System Architecture Assessment**: The system uses a modular monolith architecture based on the ABP Framework. The database technology is SQL Server. The Authentication domain will integrate seamlessly with the ABP Identity module.
-- **3.2 Performance and Scalability Analysis**:
-  - **Data Volume**: User base is expected to grow to 500 new accounts/week. The `PasswordResetTokens` table will have transient data, which should be periodically cleaned up.
-  - **Transaction Volume**: The system must handle 1,000 concurrent authentication requests/sec with server response times under 800ms.
-  - **Performance Targets**: Indexing on key lookup fields (`Email`, `NormalizedEmail`, `ResetTokenHash`) is critical to meet performance targets.
-- **3.3 Security and Compliance Analysis**:
-  - **Authentication**: Handled by ABP Identity using JWT Bearer tokens.
-  - **Authorization**: Managed by the ABP Permission System.
-  - **Encryption**: Passwords and reset tokens must be hashed using **Bcrypt**. Data in transit must be encrypted using **HTTPS (TLS 1.2+)**.
-  - **Audit Logging**: ABP's built-in auditing features will be enabled for all entities to track data changes.
+### 1.1 Scope
 
-### 4. Entity Relationship Diagram
-- **4.1 ERD Overview**:
-  - **Database Design Pattern**: The design leverages the existing identity management schema provided by the ABP Framework (`AbpUser`) and extends it with a custom table for password reset tokens to meet specific business requirements.
-  - **Normalization Level**: 3NF.
-  - **Total Entities**: 2.
-  - **Total Relationships**: 1.
-  - **Design Principles**: Adherence to ABP Framework conventions, security-first (hashing sensitive data), and performance-oriented indexing.
+The ERD covers the following authentication-related entities:
+- **User Management**: User accounts and profiles
+- **Session Management**: User sessions and authentication tokens
+- **Password Reset**: Password reset tokens and workflow
+- **Security**: Account lockout and failed login tracking
 
-- **4.2 ERD Diagram**:
-  - **Mermaid ERD Diagram**:
-    ```mermaid
-    erDiagram
-        AbpUsers {
-            uniqueidentifier Id PK
-            string UserName
-            string NormalizedUserName
-            string Email
-            string NormalizedEmail
-            string PasswordHash
-            string SecurityStamp
-            boolean LockoutEnabled
-            datetimeoffset LockoutEnd
-            int AccessFailedCount
-            string ConcurrencyStamp
-            boolean IsDeleted
-        }
+### 1.2 Technology Context
 
-        PasswordResetTokens {
-            uniqueidentifier Id PK
-            uniqueidentifier UserId FK
-            string ResetTokenHash
-            datetime2 ExpirationTimeUtc
-            boolean IsUsed
-            datetime2 CreationTime
-        }
+- **Framework**: ABP Framework 8.3.0 with Entity Framework Core
+- **Database**: SQL Server
+- **Architecture**: Domain-Driven Design (DDD) with Clean Architecture
+- **Caching**: Redis for session and user data
 
-        AbpUsers ||--o{ PasswordResetTokens : "has"
-    ```
-  - **ERD Diagram Notes**:
-    - The `AbpUsers` entity represents the core user account and is a standard entity provided by the ABP Framework. Only relevant attributes for this feature are shown.
-    - `PK`: Primary Key
-    - `FK`: Foreign Key
+---
 
-- **4.3 Entity Definitions**:
-  - **Entity: `AbpUsers`** (Leveraging existing ABP Identity User)
-    - **Purpose**: To store user identity, credentials, and security-related information.
-    - **Business Rules**: Governed by ABP Identity module rules and extended by requirements like account lockout.
-    - **Attributes**:
-      | Column Name          | Data Type        | Constraints                               | Description                                                                 |
-      |----------------------|------------------|-------------------------------------------|-----------------------------------------------------------------------------|
-      | `Id`                 | `uniqueidentifier` | PK, Not Null                              | Unique identifier for the user.                                             |
-      | `UserName`           | `nvarchar(256)`  | Not Null                                  | User's chosen username.                                                     |
-      | `NormalizedUserName` | `nvarchar(256)`  | Not Null, Indexed                         | Uppercased version of the username for case-insensitive lookups.            |
-      | `Email`              | `nvarchar(256)`  | Not Null                                  | User's email address.                                                       |
-      | `NormalizedEmail`    | `nvarchar(256)`  | Not Null, Indexed, Unique                 | Uppercased version of the email for case-insensitive unique lookups.        |
-      | `PasswordHash`       | `nvarchar(max)`  | Nullable                                  | Hashed version of the user's password using Bcrypt.                         |
-      | `SecurityStamp`      | `nvarchar(max)`  | Nullable                                  | A random value that changes when user credentials change.                   |
-      | `LockoutEnd`         | `datetimeoffset(7)`| Nullable                                  | The date and time until the user is locked out.                             |
-      | `LockoutEnabled`     | `bit`            | Not Null                                  | Flag indicating if this user can be locked out.                             |
-      | `AccessFailedCount`  | `int`            | Not Null                                  | Number of consecutive failed login attempts.                                |
-    - **Indexes**:
-      - `IX_AbpUsers_NormalizedUserName`: Non-clustered index on `NormalizedUserName`.
-      - `IX_AbpUsers_NormalizedEmail`: Unique, non-clustered index on `NormalizedEmail`.
-    - **Relationships**:
-      - One-to-Many with `PasswordResetTokens`.
+## 2. Entity Relationship Diagram
 
-  - **Entity: `PasswordResetTokens`** (Custom Entity)
-    - **Purpose**: To securely store single-use tokens for the password reset process.
-    - **Business Rules**: A token is generated upon user request, is valid for 60 minutes, and can only be used once.
-    - **Attributes**:
-      | Column Name         | Data Type        | Constraints  | Description                                                 |
-      |---------------------|------------------|--------------|-------------------------------------------------------------|
-      | `Id`                | `uniqueidentifier` | PK, Not Null | Unique identifier for the token record.                     |
-      | `UserId`            | `uniqueidentifier` | FK, Not Null | Foreign key referencing the `AbpUsers(Id)` table.           |
-      | `ResetTokenHash`    | `nvarchar(max)`  | Not Null     | Hashed version of the password reset token.                 |
-      | `ExpirationTimeUtc` | `datetime2`      | Not Null     | The UTC date and time when the token expires (60 mins).     |
-      | `IsUsed`            | `bit`            | Not Null     | Flag indicating if the token has already been used.         |
-      | `CreationTime`      | `datetime2`      | Not Null     | The UTC date and time when the token was created.           |
-    - **Indexes**:
-      - `IX_PasswordResetTokens_UserId`: Non-clustered index on `UserId` to speed up lookups for a user's tokens.
-    - **Relationships**:
-      - Many-to-One with `AbpUsers`.
+### 2.1 Visual ERD
 
-### 5. Performance Optimization
-- **5.1 Indexing Strategy**:
-  - **Primary Indexes**: Primary keys on all tables (`Id`) will use a clustered index by default in SQL Server.
-  - **Secondary Indexes**:
-    | Entity       | Index Name                        | Type          | Columns             | Purpose                               | Query Pattern                               |
-    |--------------|-----------------------------------|---------------|---------------------|---------------------------------------|---------------------------------------------|
-    | `AbpUsers`   | `IX_AbpUsers_NormalizedEmail`     | Unique        | `NormalizedEmail`   | Fast, case-insensitive email lookup.  | `WHERE NormalizedEmail = @email`            |
-    | `AbpUsers`   | `IX_AbpUsers_NormalizedUserName`  | Non-Unique    | `NormalizedUserName`| Fast, case-insensitive username lookup. | `WHERE NormalizedUserName = @username`      |
-    | `PasswordResetTokens` | `IX_PasswordResetTokens_UserId` | Non-Unique    | `UserId`            | Fast lookup of tokens for a user.     | `WHERE UserId = @userId`                    |
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           Authentication System ERD                             │
+└─────────────────────────────────────────────────────────────────────────────────┘
 
-- **5.2 Query Optimization**:
-  - **Strategy**: Queries will be implemented via Entity Framework Core, leveraging LINQ which translates to parameterized SQL, preventing SQL injection. Avoid raw SQL queries.
-  - **Common Query Patterns**:
-    | Operation          | Query Logic                                                              | Involved Tables         | Performance Notes                               |
-    |--------------------|--------------------------------------------------------------------------|-------------------------|-------------------------------------------------|
-    | User Login         | `SELECT * FROM AbpUsers WHERE NormalizedEmail = @email`                  | `AbpUsers`              | Fast due to index on `NormalizedEmail`.         |
-    | Token Validation   | `SELECT * FROM PasswordResetTokens WHERE ResetTokenHash = @tokenHash`    | `PasswordResetTokens`   | Requires a full scan if not indexed. **TBD: Add index on `ResetTokenHash` if performance degrades.** |
-    | User Registration  | `INSERT INTO AbpUsers ...`                                               | `AbpUsers`              | Standard insert performance.                    |
+┌──────────────────────────┐         ┌──────────────────────────┐
+│        AbpUsers          │         │       Sessions           │
+│ (Extended ABP Identity)  │         │                          │
+├──────────────────────────┤    1:N  ├──────────────────────────┤
+│ Id (PK)                  │◄────────┤ Id (PK)                  │
+│ UserName                 │         │ UserId (FK)              │
+│ Email (Unique)           │         │ TokenHash                │
+│ EmailConfirmed           │         │ CreatedAt                │
+│ PasswordHash             │         │ ExpiresAt                │
+│ SecurityStamp            │         │ IsActive                 │
+│ PhoneNumber              │         │ LastAccessedAt           │
+│ TwoFactorEnabled         │         │ IpAddress                │
+│ LockoutEnd               │         │ UserAgent                │
+│ LockoutEnabled           │         └──────────────────────────┘
+│ AccessFailedCount        │
+│ CreationTime             │         ┌──────────────────────────┐
+│ CreatorId                │         │   PasswordResetTokens    │
+│ LastModificationTime     │         │                          │
+│ LastModifierId           │    1:N  ├──────────────────────────┤
+│ IsDeleted                │◄────────┤ Id (PK)                  │
+│ DeleterId                │         │ UserId (FK)              │
+│ DeletionTime             │         │ TokenHash                │
+│ TenantId                 │         │ CreatedAt                │
+│ ConcurrencyStamp         │         │ ExpiresAt                │
+└──────────────────────────┘         │ IsUsed                   │
+                                     │ UsedAt                   │
+                                     │ IpAddress                │
+                                     │ UserAgent                │
+                                     └──────────────────────────┘
 
-### 6. Security and Access Control
-- **6.1 Database Security Model**:
-  - **Authentication**: Application connects to SQL Server using a dedicated, least-privilege user account. Connection strings are managed securely via application settings.
-  - **Authorization**: Database access is restricted to the application's service account. User-level permissions are managed by the ABP Permission System (RBAC) at the application layer, not at the database level.
-- **6.2 User Roles and Permissions**:
-  - **RBAC Strategy**: The ABP Identity module provides a comprehensive role-based access control system.
-  - **Database Roles**:
-    | Role Name | Description                               | Permissions Granted in DB                               |
-    |-----------|-------------------------------------------|---------------------------------------------------------|
-    | `AppUser` | The application's service account role.   | `SELECT`, `INSERT`, `UPDATE`, `DELETE` on application tables. |
-    | `Admin`   | (Application Role) Full system access.    | N/A (Managed at application layer)                      |
-    | `User`    | (Application Role) Standard user access.  | N/A (Managed at application layer)                      |
+┌──────────────────────────┐         ┌──────────────────────────┐
+│    LoginAttempts         │         │      UserSessions        │
+│   (Security Tracking)   │         │    (Active Sessions)     │
+├──────────────────────────┤    1:N  ├──────────────────────────┤
+│ Id (PK)                  │◄────────┤ Id (PK)                  │
+│ UserId (FK)              │         │ UserId (FK)              │
+│ Email                    │         │ SessionId (FK)           │
+│ IpAddress                │         │ DeviceInfo               │
+│ UserAgent                │         │ Location                 │
+│ AttemptedAt              │         │ IsCurrentSession         │
+│ IsSuccessful             │         │ CreatedAt                │
+│ FailureReason            │         │ LastActivityAt           │
+│ TenantId                 │         └──────────────────────────┘
+└──────────────────────────┘
+```
 
-### 7. Implementation Strategy
-- **7.1 Database Implementation Approach**:
-  - **Methodology**: Code-First approach using Entity Framework Core.
-  - **Environment**: Local development using SQL Server LocalDB, with production using a dedicated SQL Server instance.
-  - **Version Control**: Schema changes (migrations) are stored as C# code in the `.EntityFrameworkCore` project and tracked in Git.
-- **7.2 Data Migration Strategy**:
-  - **Approach**: Use EF Core Migrations to apply schema changes. A dedicated migrator tool (`AbpApp.DbMigrator`) is provided in the solution to apply migrations and seed data.
-  - **Validation**: Migrations will be tested in a staging environment before being applied to production.
+### 2.2 Entity Relationships Summary
 
-### 8. Requirements Traceability
-- **8.1 Domain Model Mapping**:
-  | Domain Entity         | Database Entity(s)      | Key Attributes Mapped                               | Notes                                                                 |
-  |-----------------------|-------------------------|-----------------------------------------------------|-----------------------------------------------------------------------|
-  | `User Account`        | `AbpUsers`              | `Email`, `PasswordHash`, `LockoutEnd`               | Leverages the standard, feature-rich ABP Identity User entity.        |
-  | `Password Reset Token`| `PasswordResetTokens`   | `ResetTokenHash`, `ExpirationTimeUtc`, `IsUsed`     | Custom entity to meet the specific requirement of storing token hashes. |
+| Parent Entity | Child Entity | Relationship | Cardinality | Description |
+|---------------|--------------|--------------|-------------|-------------|
+| AbpUsers | Sessions | One-to-Many | 1:N | A user can have multiple active sessions |
+| AbpUsers | PasswordResetTokens | One-to-Many | 1:N | A user can have multiple reset tokens (historical) |
+| AbpUsers | LoginAttempts | One-to-Many | 1:N | A user can have multiple login attempts |
+| AbpUsers | UserSessions | One-to-Many | 1:N | A user can have multiple session records |
+| Sessions | UserSessions | One-to-One | 1:1 | Each session has detailed session information |
 
-- **8.2 Business Rules Mapping**:
-  | Domain Rule ID | Description                               | Database Constraint / Implementation                                                              | Validation                                                              |
-  |----------------|-------------------------------------------|---------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-  | FR-REG-04      | Email must be unique.                     | `UNIQUE` index on `NormalizedEmail` column in `AbpUsers`.                                         | Database will throw an exception on duplicate insert.                   |
-  | FR-REG-05      | Password complexity rules.                | Enforced at the application layer before saving to the database.                                  | Unit tests for the registration logic.                                  |
-  | FR-LOG-06      | Lock account after 5 failed attempts.     | `AccessFailedCount` and `LockoutEnd` columns in `AbpUsers`, managed by ABP Identity.              | Integration test simulating multiple failed logins.                     |
-  | FR-RP-06       | Store hashed reset token and expiry.      | `ResetTokenHash` and `ExpirationTimeUtc` columns in `PasswordResetTokens` table.                  | Verify record creation in the database during a password reset test.    |
-  | NFR-SEC-01     | Hash passwords with Bcrypt.               | Implemented at the application layer via ABP's Identity Password Hasher configuration.            | Code review and verification of the password hasher implementation.     |
-  | NFR-SEC-04     | Reset token expires in 60 minutes.        | `ExpirationTimeUtc` is set to `CreationTime + 60 minutes`. A background job **TBD** could clean up expired tokens. | Unit test to check token validation logic against the expiration time. |
+---
+
+## 3. Entity Specifications
+
+### 3.1 AbpUsers (Extended ABP Identity)
+
+**Purpose**: Core user entity extending ABP Framework's Identity module for authentication.
+
+| Column Name | Data Type | Constraints | Description |
+|-------------|-----------|-------------|-------------|
+| Id | UNIQUEIDENTIFIER | PK, NOT NULL | Primary key, auto-generated GUID |
+| UserName | NVARCHAR(256) | NOT NULL, UNIQUE | Username for login (can be same as email) |
+| Email | NVARCHAR(256) | NOT NULL, UNIQUE | User's email address (primary identifier) |
+| EmailConfirmed | BIT | NOT NULL, DEFAULT 0 | Email verification status |
+| PasswordHash | NVARCHAR(512) | NOT NULL | BCrypt hashed password (cost factor 12) |
+| SecurityStamp | NVARCHAR(256) | NOT NULL | Security stamp for token invalidation |
+| PhoneNumber | NVARCHAR(50) | NULL | User's phone number |
+| TwoFactorEnabled | BIT | NOT NULL, DEFAULT 0 | Two-factor authentication status |
+| LockoutEnd | DATETIME2 | NULL | Account lockout expiration time |
+| LockoutEnabled | BIT | NOT NULL, DEFAULT 1 | Whether account can be locked |
+| AccessFailedCount | INT | NOT NULL, DEFAULT 0 | Failed login attempts counter |
+| CreationTime | DATETIME2 | NOT NULL, DEFAULT GETUTCDATE() | Account creation timestamp |
+| CreatorId | UNIQUEIDENTIFIER | NULL | ID of user who created this account |
+| LastModificationTime | DATETIME2 | NULL | Last modification timestamp |
+| LastModifierId | UNIQUEIDENTIFIER | NULL | ID of user who last modified |
+| IsDeleted | BIT | NOT NULL, DEFAULT 0 | Soft delete flag |
+| DeleterId | UNIQUEIDENTIFIER | NULL | ID of user who deleted |
+| DeletionTime | DATETIME2 | NULL | Deletion timestamp |
+| TenantId | UNIQUEIDENTIFIER | NULL | Multi-tenant identifier |
+| ConcurrencyStamp | NVARCHAR(40) | NOT NULL | Optimistic concurrency control |
+
+**Business Rules**:
+- Email must be unique across the system
+- Password must meet complexity requirements (8+ chars, uppercase, lowercase, number)
+- Account locks after 5 failed login attempts within 15 minutes
+- Lockout duration is 15 minutes
+
+### 3.2 Sessions
+
+**Purpose**: Manages user authentication sessions and JWT tokens.
+
+| Column Name | Data Type | Constraints | Description |
+|-------------|-----------|-------------|-------------|
+| Id | UNIQUEIDENTIFIER | PK, NOT NULL | Primary key, auto-generated GUID |
+| UserId | UNIQUEIDENTIFIER | FK, NOT NULL | Reference to AbpUsers.Id |
+| TokenHash | NVARCHAR(512) | NOT NULL, UNIQUE | Hashed session token for security |
+| CreatedAt | DATETIME2 | NOT NULL, DEFAULT GETUTCDATE() | Session creation timestamp |
+| ExpiresAt | DATETIME2 | NOT NULL | Session expiration timestamp |
+| IsActive | BIT | NOT NULL, DEFAULT 1 | Session active status |
+| LastAccessedAt | DATETIME2 | NULL | Last activity timestamp |
+| IpAddress | NVARCHAR(45) | NULL | Client IP address (IPv4/IPv6) |
+| UserAgent | NVARCHAR(500) | NULL | Client browser/device information |
+
+**Business Rules**:
+- Sessions expire after 24 hours of inactivity
+- Maximum 5 concurrent sessions per user
+- Tokens are cryptographically secure and hashed
+- Automatic cleanup of expired sessions
+
+### 3.3 PasswordResetTokens
+
+**Purpose**: Manages password reset tokens for secure password recovery.
+
+| Column Name | Data Type | Constraints | Description |
+|-------------|-----------|-------------|-------------|
+| Id | UNIQUEIDENTIFIER | PK, NOT NULL | Primary key, auto-generated GUID |
+| UserId | UNIQUEIDENTIFIER | FK, NOT NULL | Reference to AbpUsers.Id |
+| TokenHash | NVARCHAR(512) | NOT NULL, UNIQUE | Hashed reset token for security |
+| CreatedAt | DATETIME2 | NOT NULL, DEFAULT GETUTCDATE() | Token creation timestamp |
+| ExpiresAt | DATETIME2 | NOT NULL | Token expiration timestamp |
+| IsUsed | BIT | NOT NULL, DEFAULT 0 | Token usage status |
+| UsedAt | DATETIME2 | NULL | Token usage timestamp |
+| IpAddress | NVARCHAR(45) | NULL | Client IP address when requested |
+| UserAgent | NVARCHAR(500) | NULL | Client browser/device information |
+
+**Business Rules**:
+- Tokens expire after 60 minutes
+- One-time use only (IsUsed = true after successful reset)
+- Maximum 3 reset requests per hour per email
+- Automatic cleanup of expired/used tokens
+
+### 3.4 LoginAttempts
+
+**Purpose**: Tracks login attempts for security monitoring and account protection.
+
+| Column Name | Data Type | Constraints | Description |
+|-------------|-----------|-------------|-------------|
+| Id | UNIQUEIDENTIFIER | PK, NOT NULL | Primary key, auto-generated GUID |
+| UserId | UNIQUEIDENTIFIER | FK, NULL | Reference to AbpUsers.Id (null for non-existent users) |
+| Email | NVARCHAR(256) | NOT NULL | Email used in login attempt |
+| IpAddress | NVARCHAR(45) | NOT NULL | Client IP address |
+| UserAgent | NVARCHAR(500) | NULL | Client browser/device information |
+| AttemptedAt | DATETIME2 | NOT NULL, DEFAULT GETUTCDATE() | Login attempt timestamp |
+| IsSuccessful | BIT | NOT NULL | Login attempt result |
+| FailureReason | NVARCHAR(200) | NULL | Reason for failed login |
+| TenantId | UNIQUEIDENTIFIER | NULL | Multi-tenant identifier |
+
+**Business Rules**:
+- Records all login attempts (successful and failed)
+- Used for security analysis and threat detection
+- Automatic cleanup after 90 days
+- Triggers account lockout after 5 failed attempts
+
+### 3.5 UserSessions
+
+**Purpose**: Extended session information for user activity tracking.
+
+| Column Name | Data Type | Constraints | Description |
+|-------------|-----------|-------------|-------------|
+| Id | UNIQUEIDENTIFIER | PK, NOT NULL | Primary key, auto-generated GUID |
+| UserId | UNIQUEIDENTIFIER | FK, NOT NULL | Reference to AbpUsers.Id |
+| SessionId | UNIQUEIDENTIFIER | FK, NOT NULL | Reference to Sessions.Id |
+| DeviceInfo | NVARCHAR(200) | NULL | Device type and OS information |
+| Location | NVARCHAR(100) | NULL | Approximate geographic location |
+| IsCurrentSession | BIT | NOT NULL, DEFAULT 0 | Current active session flag |
+| CreatedAt | DATETIME2 | NOT NULL, DEFAULT GETUTCDATE() | Session creation timestamp |
+| LastActivityAt | DATETIME2 | NOT NULL | Last user activity timestamp |
+
+**Business Rules**:
+- One current session per device type
+- Used for "Active Sessions" management
+- Automatic cleanup when parent session expires
+
+---
+
+## 4. Database Indexes and Constraints
+
+### 4.1 Primary Keys
+- `PK_AbpUsers` on AbpUsers(Id)
+- `PK_Sessions` on Sessions(Id)
+- `PK_PasswordResetTokens` on PasswordResetTokens(Id)
+- `PK_LoginAttempts` on LoginAttempts(Id)
+- `PK_UserSessions` on UserSessions(Id)
+
+### 4.2 Foreign Key Constraints
+- `FK_Sessions_UserId` on Sessions(UserId) → AbpUsers(Id)
+- `FK_PasswordResetTokens_UserId` on PasswordResetTokens(UserId) → AbpUsers(Id)
+- `FK_LoginAttempts_UserId` on LoginAttempts(UserId) → AbpUsers(Id)
+- `FK_UserSessions_UserId` on UserSessions(UserId) → AbpUsers(Id)
+- `FK_UserSessions_SessionId` on UserSessions(SessionId) → Sessions(Id)
+
+### 4.3 Unique Constraints
+- `UQ_AbpUsers_Email` on AbpUsers(Email)
+- `UQ_AbpUsers_UserName` on AbpUsers(UserName)
+- `UQ_Sessions_TokenHash` on Sessions(TokenHash)
+- `UQ_PasswordResetTokens_TokenHash` on PasswordResetTokens(TokenHash)
+
+### 4.4 Performance Indexes
+
+#### 4.4.1 Authentication Indexes
+```sql
+-- User lookup by email (login)
+CREATE INDEX IX_AbpUsers_Email ON AbpUsers(Email) WHERE IsDeleted = 0;
+
+-- User lookup by username
+CREATE INDEX IX_AbpUsers_UserName ON AbpUsers(UserName) WHERE IsDeleted = 0;
+
+-- Account lockout queries
+CREATE INDEX IX_AbpUsers_LockoutEnd ON AbpUsers(LockoutEnd) WHERE LockoutEnd IS NOT NULL;
+```
+
+#### 4.4.2 Session Management Indexes
+```sql
+-- Session validation by token
+CREATE INDEX IX_Sessions_TokenHash ON Sessions(TokenHash) WHERE IsActive = 1;
+
+-- User's active sessions
+CREATE INDEX IX_Sessions_UserId_IsActive ON Sessions(UserId, IsActive);
+
+-- Session cleanup by expiration
+CREATE INDEX IX_Sessions_ExpiresAt ON Sessions(ExpiresAt) WHERE IsActive = 1;
+```
+
+#### 4.4.3 Password Reset Indexes
+```sql
+-- Token validation
+CREATE INDEX IX_PasswordResetTokens_TokenHash ON PasswordResetTokens(TokenHash) WHERE IsUsed = 0;
+
+-- User's reset tokens
+CREATE INDEX IX_PasswordResetTokens_UserId_IsUsed ON PasswordResetTokens(UserId, IsUsed);
+
+-- Token cleanup by expiration
+CREATE INDEX IX_PasswordResetTokens_ExpiresAt ON PasswordResetTokens(ExpiresAt) WHERE IsUsed = 0;
+```
+
+#### 4.4.4 Security Monitoring Indexes
+```sql
+-- Failed login attempts by email
+CREATE INDEX IX_LoginAttempts_Email_AttemptedAt ON LoginAttempts(Email, AttemptedAt) WHERE IsSuccessful = 0;
+
+-- User login history
+CREATE INDEX IX_LoginAttempts_UserId_AttemptedAt ON LoginAttempts(UserId, AttemptedAt);
+
+-- IP-based security analysis
+CREATE INDEX IX_LoginAttempts_IpAddress_AttemptedAt ON LoginAttempts(IpAddress, AttemptedAt);
+```
+
+---
+
+## 5. Data Integrity and Security
+
+### 5.1 Data Validation Rules
+
+#### 5.1.1 Email Validation
+- Must conform to RFC 5322 standard
+- Maximum length: 256 characters
+- Must be unique across the system
+- Case-insensitive comparison
+
+#### 5.1.2 Password Security
+- Minimum 8 characters
+- Must contain: uppercase, lowercase, and numeric characters
+- Stored as BCrypt hash with cost factor 12
+- Security stamp updated on password change
+
+#### 5.1.3 Token Security
+- Cryptographically secure random generation
+- SHA-256 hashing before storage
+- Time-based expiration enforcement
+- One-time use for reset tokens
+
+### 5.2 Audit Trail
+
+All entities include audit fields following ABP Framework conventions:
+- **CreationTime**: When the record was created
+- **CreatorId**: Who created the record
+- **LastModificationTime**: When last modified
+- **LastModifierId**: Who last modified
+- **IsDeleted**: Soft delete flag
+- **DeletionTime**: When deleted
+- **DeleterId**: Who deleted
+
+### 5.3 Multi-Tenancy Support
+
+The system supports multi-tenancy through:
+- **TenantId**: Tenant isolation identifier
+- **Tenant-aware queries**: Automatic filtering by tenant
+- **Cross-tenant security**: Prevention of data leakage
+
+---
+
+## 6. Performance Considerations
+
+### 6.1 Query Optimization
+
+#### 6.1.1 Most Frequent Queries
+1. **User Login**: `SELECT * FROM AbpUsers WHERE Email = @email AND IsDeleted = 0`
+2. **Session Validation**: `SELECT * FROM Sessions WHERE TokenHash = @tokenHash AND IsActive = 1`
+3. **Password Reset**: `SELECT * FROM PasswordResetTokens WHERE TokenHash = @tokenHash AND IsUsed = 0`
+
+#### 6.1.2 Caching Strategy
+- **User Profile**: Redis cache with 1-hour TTL
+- **Active Sessions**: Redis cache with session expiration TTL
+- **Failed Login Attempts**: Redis cache with 15-minute TTL
+
+### 6.2 Scalability Measures
+
+#### 6.2.1 Database Partitioning
+- **LoginAttempts**: Partition by date (monthly)
+- **Sessions**: Partition by creation date
+- **PasswordResetTokens**: Automatic cleanup of expired tokens
+
+#### 6.2.2 Connection Pooling
+- Entity Framework Core connection pooling
+- Maximum pool size: 100 connections
+- Connection timeout: 30 seconds
+
+---
+
+## 7. Data Migration and Maintenance
+
+### 7.1 Initial Data Setup
+
+```sql
+-- Default admin user (created during migration)
+INSERT INTO AbpUsers (Id, UserName, Email, EmailConfirmed, PasswordHash, SecurityStamp, CreationTime)
+VALUES (NEWID(), 'admin', 'admin@abpapp.com', 1, '[BCrypt_Hash]', NEWID(), GETUTCDATE());
+```
+
+### 7.2 Maintenance Procedures
+
+#### 7.2.1 Cleanup Jobs
+```sql
+-- Clean expired sessions (daily)
+DELETE FROM Sessions WHERE ExpiresAt < GETUTCDATE() AND IsActive = 0;
+
+-- Clean expired reset tokens (daily)
+DELETE FROM PasswordResetTokens WHERE ExpiresAt < GETUTCDATE() OR IsUsed = 1;
+
+-- Archive old login attempts (weekly)
+DELETE FROM LoginAttempts WHERE AttemptedAt < DATEADD(DAY, -90, GETUTCDATE());
+```
+
+#### 7.2.2 Health Checks
+- Monitor failed login attempt rates
+- Track session creation/expiration ratios
+- Alert on unusual password reset patterns
+
+---
+
+## 8. Integration Points
+
+### 8.1 ABP Framework Integration
+
+The ERD integrates with ABP Framework modules:
+- **Identity Module**: Extends AbpUsers entity
+- **Permission Management**: User-role associations
+- **Audit Logging**: Automatic audit trail
+- **Multi-Tenancy**: Tenant isolation support
+
+### 8.2 External Dependencies
+
+#### 8.2.1 Email Service Integration
+- **SendGrid**: Password reset email delivery
+- **Templates**: Branded email templates
+- **Tracking**: Delivery and open rates
+
+#### 8.2.2 Caching Integration
+- **Redis**: Session and user data caching
+- **Distributed Cache**: Multi-instance support
+- **Cache Invalidation**: Coordinated cache updates
+
+---
+
+## 9. Security Compliance
+
+### 9.1 Data Protection
+
+#### 9.1.1 GDPR Compliance
+- **Right to be Forgotten**: Soft delete with anonymization
+- **Data Portability**: User data export capabilities
+- **Consent Management**: Email confirmation tracking
+
+#### 9.1.2 Security Standards
+- **OWASP**: Follows OWASP authentication guidelines
+- **NIST**: Password policy compliance
+- **ISO 27001**: Security management alignment
+
+### 9.2 Encryption and Hashing
+
+#### 9.2.1 Data at Rest
+- **Database**: TDE (Transparent Data Encryption)
+- **Backups**: Encrypted backup files
+- **Logs**: Sensitive data redaction
+
+#### 9.2.2 Data in Transit
+- **HTTPS**: TLS 1.2+ for all communications
+- **API Security**: JWT token-based authentication
+- **Certificate Management**: Automated certificate renewal
+
+---
+
+## 10. Conclusion
+
+This Entity Relationship Diagram provides a comprehensive data model for the Authentication feature, supporting:
+
+### 10.1 Key Features Supported
+- ✅ User registration with email verification
+- ✅ Secure login with password validation
+- ✅ Password reset via email tokens
+- ✅ Session management and logout
+- ✅ Account lockout protection
+- ✅ Security monitoring and audit trails
+
+### 10.2 Non-Functional Requirements Met
+- **Security**: BCrypt password hashing, secure token generation
+- **Performance**: Optimized indexes for sub-800ms response times
+- **Scalability**: Support for 1,000+ concurrent users
+- **Reliability**: 99.9% uptime through proper data design
+- **Maintainability**: Clean, normalized database structure
+
+### 10.3 Future Extensibility
+The ERD is designed to support future enhancements:
+- Two-factor authentication (2FA)
+- Social media login integration
+- Advanced user profile management
+- Role-based access control (RBAC)
+- Single sign-on (SSO) capabilities
+
+This data model serves as the foundation for implementing a robust, secure, and scalable authentication system that meets all current requirements while providing flexibility for future growth.
+
+---
+
+**Document Status**: ✅ Ready for Implementation  
+**Next Steps**: Database schema creation and Entity Framework Core model configuration

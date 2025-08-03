@@ -1,17 +1,21 @@
 # META-PROMPT: DOMAIN SERVICE GENERATOR
 
 ## 1. VAI TRÒ
+
 Bạn là một AI Prompt Engineer chuyên tạo prompts cho việc generate Domain Services trong ABP Framework projects theo Domain-Driven Design principles.
 
 ## 2. BỐI CẢNH
+
 **Input cần thiết**:
-1. **BussinessLogic_[FeatureName].md** - Domain model đã được thiết kế
-2. **ImplementPlan_[FeatureName].md** - Chi tiết kỹ thuật implementation  
-3. **PRD_[FeatureName].md** - Business requirements và workflows
+
+1. **BussinessLogic\_[FeatureName].md** - Domain model đã được thiết kế
+2. **ImplementPlan\_[FeatureName].md** - Chi tiết kỹ thuật implementation
+3. **PRD\_[FeatureName].md** - Business requirements và workflows
 4. **Feature Name** - Tên feature cần generate domain services
 5. **Project Path** - Đường dẫn đến thư mục gốc project liên quan đến backend
 
 **Dynamic Project Information** (extracted from inputs):
+
 - **Technology Stack**: {AUTO_DETECT_FROM_CODEBASE_AND_IMPLEMENTPLAN}
 - **Language & Framework**: {INFER_FROM_CODE_STANDARD_AND_IMPLEMENTPLAN}
 - **Architecture Pattern**: {EXTRACT_FROM_IMPLEMENTPLAN_AND_CODEBASE}
@@ -20,16 +24,22 @@ Bạn là một AI Prompt Engineer chuyên tạo prompts cho việc generate Dom
 - **Required Components**: {DETERMINE_FROM_FUNCTION_PLANNING_IN_IMPLEMENTPLAN}
 
 ## 3. MỤC TIÊU
-Tạo ra một prompt chi tiết để generate Domain Services cho bất kỳ feature nào, tuân thủ:
-- Domain-Driven Design principles cho cross-aggregate business logic
-- ABP Framework conventions và best practices
-- Stateless service design với dependency injection
-- Business logic implementation từ requirements
-- Complete unit testing coverage
+
+Tạo file `DOMAIN_SERVICE_{FeatureName}_Prompt.md` để:
+
+1. Generate code files:
+   - I{FeatureName}DomainService.cs
+   - {FeatureName}DomainService.cs
+2. Generate documentation:
+   - DomainServices\_{FeatureName}.md với:
+     - Cross-aggregate operations mô tả
+     - Business rule implementations
+     - Method signatures và usage
 
 ## 4. TEMPLATE GENERATION PROCESS
 
 ### Bước 1: Phân tích Input Documents
+
 ```
 Đọc và phân tích:
 - BussinessLogic_[FeatureName].md → Extract domain entities, aggregates, repositories
@@ -38,7 +48,9 @@ Tạo ra một prompt chi tiết để generate Domain Services cho bất kỳ f
 ```
 
 ### Bước 2: Identify Domain Service Components
+
 Từ analysis, xác định:
+
 - **Cross-Aggregate Operations**: Business logic spans multiple aggregates
 - **Complex Business Workflows**: Multi-step processes với validation
 - **Business Rule Enforcement**: Validation logic across domain objects
@@ -46,7 +58,9 @@ Từ analysis, xác định:
 - **Domain Events Publishing**: Trigger events for business actions
 
 ### Bước 3: Map to Service Structure
+
 Ánh xạ components vào cấu trúc services:
+
 ```
 {ProjectName}/
 ├── Services/{FeatureName}/
@@ -60,15 +74,17 @@ Từ analysis, xác định:
 
 ## 5. PROMPT TEMPLATE
 
-```markdown
+````markdown
 # DOMAIN SERVICE {FEATURE_NAME} - IMPLEMENTATION PROMPT
 
 ## 1. VAI TRÒ
+
 Bạn là một Senior Software Architect chuyên về Domain-Driven Design và Multi-File Code Generation.
 
 ## 2. BỐI CẢNH
 
 ### Auto-Detected Project Configuration:
+
 - **Framework**: {AUTO_DETECTED_FRAMEWORK}
 - **Language**: {AUTO_DETECTED_LANGUAGE}
 - **Architecture**: {DETECTED_ARCHITECTURE_TYPE}
@@ -80,46 +96,103 @@ Bạn là một Senior Software Architect chuyên về Domain-Driven Design và 
 **Database**: {DATABASE_INFO}
 
 ### Input Documents đã phân tích:
-- **BussinessLogic_{FeatureName}.md**: {DOMAIN_MODEL_SUMMARY}
-- **ImplementPlan_{FeatureName}.md**: {IMPLEMENTATION_SUMMARY}
-- **PRD_{FeatureName}.md**: {BUSINESS_REQUIREMENTS_SUMMARY}
+
+- **BussinessLogic\_{FeatureName}.md**: {DOMAIN_MODEL_SUMMARY}
+- **ImplementPlan\_{FeatureName}.md**: {IMPLEMENTATION_SUMMARY}
+- **PRD\_{FeatureName}.md**: {BUSINESS_REQUIREMENTS_SUMMARY}
 
 ### Domain Model Components Available:
+
 {DOMAIN_COMPONENTS_LIST}
 
 ## 3. MỤC TIÊU DOMAIN SERVICES
 
 ### 3.1 DOMAIN SERVICE CLASSES
+
 {DOMAIN_SERVICE_CLASSES_SECTION}
 
 ### 3.2 BUSINESS LOGIC IMPLEMENTATION
+
 {BUSINESS_LOGIC_SECTION}
 
 ### 3.3 REPOSITORY USAGE
+
 {REPOSITORY_USAGE_SECTION}
 
 ### 3.4 UNIT TESTS
+
 {UNIT_TESTS_SECTION}
 
+### 3.5 DOCUMENTATION
+
+{DOCUMENTATION_SECTION}
+
 ## 4. YÊU CẦU IMPLEMENTATION
+
 {IMPLEMENTATION_REQUIREMENTS_SECTION}
 
 ## 5. OUTPUT FORMAT
+
 {OUTPUT_FORMAT_SECTION}
 
 ## 6. VALIDATION CHECKLIST
+
 {VALIDATION_CHECKLIST_SECTION}
 
 ## 7. BUSINESS WORKFLOWS MAPPING
+
 {WORKFLOWS_MAPPING_SECTION}
 
-## 8. VERIFICATION
-Sau khi đã tạo tất cả các file code, hãy thực hiện build project để đảm bảo không có lỗi biên dịch.
-Chạy lệnh sau từ thư mục gốc của project (`{PROJECT_PATH}`):
+## 8. MANDATORY TESTING GATES
+
+**QUAN TRỌNG**: Thực hiện theo thứ tự, KHÔNG tiếp tục nếu bất kỳ step nào fail:
+
+### Step 1: Build Verification
+
 ```bash
+cd "{PROJECT_PATH}"
 {DETECTED_BUILD_COMMAND}
 ```
-Nếu có lỗi, hãy sửa các file đã tạo để khắc phục.
+````
+
+**FAIL-FAST**: Nếu build fail → FIX ngay lập tức trước khi tiếp tục
+
+### Step 2: Domain Service Unit Tests
+
+```bash
+# Run domain service unit tests
+dotnet test --filter "Category=DomainService" --logger "console;verbosity=detailed"
+```
+
+**QUALITY GATE**: Domain service tests PHẢI pass 100%
+
+### Step 3: Business Logic Validation
+
+```bash
+# Test business rules và cross-aggregate operations
+dotnet test --filter "TestCategory=BusinessLogic" --collect:"XPlat Code Coverage"
+```
+
+**COVERAGE REQUIREMENT**: Business logic >= 90% test coverage
+
+### Step 4: Domain Service Architecture Validation
+
+- [ ] Domain services are stateless
+- [ ] No infrastructure dependencies
+- [ ] Proper repository injection
+- [ ] Business exceptions thrown correctly
+- [ ] Cross-aggregate operations properly designed
+- [ ] Domain events published at correct points
+
+### Step 5: Integration với Domain Model Check
+
+```bash
+# Verify domain services work với generated domain model
+dotnet test --filter "TestCategory=DomainIntegration"
+echo "Domain Service Generation: ✅ PASSED QUALITY GATES"
+```
+
+**MANDATORY**: Chỉ khi tất cả gates PASS mới được phép proceed to Application Layer generation.
 
 ```
 
@@ -149,41 +222,50 @@ Khi chạy prompt này, bạn phải thực hiện các bước sau để auto-d
 
 **Step 1: Scan Project Structure**
 ```
+
 1. Read project files từ {PROJECT_PATH}
 2. Identify configuration files (.csproj, package.json, pom.xml, requirements.txt, etc.)
 3. Analyze folder structure patterns
 4. Extract framework indicators từ code files
+
 ```
 
 **Step 2: Framework Detection Rules**
 ```
-- Nếu tìm thấy "*.csproj" + "AbpModule" → ABP Framework (.NET)
-- Nếu tìm thấy "package.json" + "@nestjs" → NestJS (TypeScript)  
+
+- Nếu tìm thấy "\*.csproj" + "AbpModule" → ABP Framework (.NET)
+- Nếu tìm thấy "package.json" + "@nestjs" → NestJS (TypeScript)
 - Nếu tìm thấy "pom.xml" + "@SpringBootApplication" → Spring Boot (Java)
 - Nếu tìm thấy "manage.py" + "Django" → Django (Python)
 - Nếu tìm thấy "package.json" + "express" → Express.js (JavaScript)
+
 ```
 
 **Step 3: Path Pattern Detection**
 ```
+
 - Analyze thư mục structure để determine:
-  * Single-tier vs Multi-tier architecture
-  * Services folder organization
-  * Namespace/package naming patterns
-  * File naming conventions
+  - Single-tier vs Multi-tier architecture
+  - Services folder organization
+  - Namespace/package naming patterns
+  - File naming conventions
+
 ```
 
 **Step 4: Generate Dynamic Variables**
 ```
+
 Từ detection results, tạo các variables cho output prompt:
+
 - {AUTO_DETECTED_FRAMEWORK}
-- {AUTO_DETECTED_LANGUAGE} 
+- {AUTO_DETECTED_LANGUAGE}
 - {AUTO_DETECTED_FILE_EXT}
 - {AUTO_DETECTED_SERVICES_PATH}
 - {AUTO_DETECTED_NAMESPACE_PATTERN}
 - {AUTO_DETECTED_BASE_CLASSES}
 - {AUTO_DETECTED_BUILD_COMMAND}
-```
+
+````
 
 ### 7.2 Output Prompt Structure
 Trong generated prompt, phải include section:
@@ -196,28 +278,34 @@ Trong generated prompt, phải include section:
 - **Services Location**: {DETECTED_SERVICES_PATH}
 - **Namespace Pattern**: {DETECTED_NAMESPACE_PATTERN}
 - **Build Command**: {DETECTED_BUILD_COMMAND}
-```
+````
 
 ## 8. SECTION CUSTOMIZATION GUIDELINES
 
 ### 8.1 DOMAIN_SERVICE_CLASSES_SECTION
-```markdown
+
+````markdown
 Dựa trên {BussinessLogic}, implement các services:
 
 #### I{FeatureName}DomainService & {FeatureName}DomainService
+
 - Cross-aggregate business logic cho {FeatureName}
 - Methods được identify từ {BusinessWorkflows}:
   ```csharp
   {ExtractedMethods}
   ```
+````
+
 - Repository dependencies: {RepositoryInterfaces}
-- Files: 
+- Files:
   - `Services/{FeatureName}/I{FeatureName}DomainService.cs`
   - `Services/{FeatureName}/{FeatureName}DomainService.cs`
 
 #### {AdditionalServices}
+
 {AdditionalServiceDefinitions}
-```
+
+````
 
 ### 8.2 BUSINESS_LOGIC_SECTION
 ```markdown
@@ -232,22 +320,27 @@ Core business rules implementation:
 - {CrossAggregateOperation1}: {Description}
 - Repository coordination: {RepositoryOrchestration}
 - Transaction boundaries: {TransactionScope}
-```
+````
 
 ### 8.3 REPOSITORY_USAGE_SECTION
-```markdown
+
+````markdown
 Repository pattern implementation:
 
 #### Constructor Injection
+
 ```csharp
 {RepositoryDependencies}
 ```
+````
 
 #### Repository Operations
+
 - {RepositoryMethod1}: {Usage}
 - {RepositoryMethod2}: {Usage}
 - Transaction handling: {TransactionPattern}
-```
+
+````
 
 ### 8.4 UNIT_TESTS_SECTION
 ```markdown
@@ -264,7 +357,60 @@ Complete test coverage:
 
 #### Mock Dependencies
 {MockSetupInstructions}
-```
+````
+
+### 8.4.1 DOCUMENTATION_SECTION
+
+````markdown
+Domain Service documentation:
+
+#### DomainServices\_{FeatureName}.md
+
+Tạo comprehensive documentation file tại `docs/DEV/DomainServices_{FeatureName}.md` với nội dung:
+
+##### Domain Services Overview
+
+- {FeatureName}DomainService purpose và responsibilities
+- Key business operations implemented
+- Integration với other domain components
+
+##### Service Methods Documentation
+
+{FOR_EACH_SERVICE_METHOD}
+
+###### {MethodName}
+
+- **Purpose**: {MethodDescription}
+- **Parameters**:
+  - `{ParamType} {ParamName}`: {ParamDescription}
+- **Return**: `{ReturnType}` - {ReturnDescription}
+- **Business Rules**: {BusinessRulesApplied}
+- **Exceptions**: {PossibleExceptions}
+- **Usage Example**:
+  ```csharp
+  {UsageExample}
+  ```
+````
+
+##### Business Logic Flows
+
+- {BusinessFlow1}: {FlowDescription}
+- Cross-aggregate operations: {CrossAggregateDetails}
+- Domain events triggered: {DomainEventsList}
+
+##### Integration Points
+
+- Repository dependencies: {RepositoryDependencies}
+- Other domain services: {DomainServiceDependencies}
+- External service integration: {ExternalIntegrations}
+
+##### Testing Guidelines
+
+- Unit test scenarios: {TestScenarios}
+- Mock setup requirements: {MockRequirements}
+- Integration test considerations: {IntegrationTestNotes}
+
+````
 
 ### 8.5 IMPLEMENTATION_REQUIREMENTS_SECTION
 ```markdown
@@ -285,23 +431,38 @@ Complete test coverage:
 - Business operation names: {BusinessOperationNames}
 - Domain parameters: {DomainParameterTypes}
 - Exception handling: {BusinessExceptionHandling}
-```
+````
 
 ### 8.6 OUTPUT_FORMAT_SECTION
+
 ```markdown
-**QUAN TRỌNG**: Generate ACTUAL CODE FILES:
+**QUAN TRỌNG**: Generate ACTUAL CODE FILES và DOCUMENTATION:
+
+#### Code Files
 
 1. **Interface File**: `Services/{FeatureName}/I{FeatureName}DomainService.cs`
 2. **Implementation File**: `Services/{FeatureName}/{FeatureName}DomainService.cs`
 3. **Unit Test File**: `Tests/{FeatureName}/{FeatureName}DomainServiceTests.cs`
 4. **Additional Services**: {AdditionalServiceFiles}
 
-Each file must be complete, compilable C# code following ABP Framework conventions.
+#### Documentation Files
+
+5. **Domain Service Documentation**: `docs/DEV/DomainServices_{FeatureName}.md`
+   - Chi tiết về domain services được implement
+   - Business logic và domain rules
+   - Method documentation với parameters và return values
+   - Usage examples và best practices
+   - Integration với other domain components
+
+Each code file must be complete, compilable C# code following ABP Framework conventions.
+Each documentation file must be comprehensive và accessible for developers.
 ```
 
 ### 8.7 VALIDATION_CHECKLIST_SECTION
+
 ```markdown
 Domain Service Quality Checklist:
+
 - [ ] Cross-aggregate business logic properly implemented
 - [ ] Methods chỉ mutate data, không có GET operations
 - [ ] Business exceptions với domain error codes: {DomainErrorCodes}
@@ -316,10 +477,12 @@ Domain Service Quality Checklist:
 ```
 
 ### 8.8 WORKFLOWS_MAPPING_SECTION
+
 ```markdown
 Business workflows implementation mapping:
 
 #### Workflow 1: {WorkflowName}
+
 - User Story: {UserStoryReference}
 - Domain Service Method: {MethodName}
 - Business Rules: {BusinessRulesApplied}
@@ -327,12 +490,14 @@ Business workflows implementation mapping:
 - Domain Events: {EventsPublished}
 
 #### {AdditionalWorkflows}
+
 {WorkflowMappings}
 ```
 
 ## 8. VALIDATION RULES
 
 ### Technical Validation:
+
 - [ ] Tuân thủ ABP Framework domain service conventions
 - [ ] Proper dependency injection pattern
 - [ ] Stateless service design
@@ -342,6 +507,7 @@ Business workflows implementation mapping:
 - [ ] Repository pattern usage
 
 ### Business Validation:
+
 - [ ] All business workflows từ PRD được implement
 - [ ] Cross-aggregate operations properly designed
 - [ ] Business rules enforcement complete
@@ -350,6 +516,7 @@ Business workflows implementation mapping:
 - [ ] Error handling với meaningful messages
 
 ### Code Quality Validation:
+
 - [ ] Complete unit test coverage
 - [ ] Proper mock usage trong tests
 - [ ] Self-explanatory method names
@@ -363,7 +530,7 @@ Business workflows implementation mapping:
 # Input
 Feature Name: "OrderProcessing"
 BussinessLogic: "docs/DEV/BussinessLogic_OrderProcessing.md"
-ImplementPlan: "docs/DEV/ImplementPlan_OrderProcessing.md"  
+ImplementPlan: "docs/DEV/ImplementPlan_OrderProcessing.md"
 PRD: "docs/BA/PRD_OrderProcessing_v1.0.md"
 Project Root: "D:/MyABPProject"
 
@@ -371,24 +538,28 @@ Project Root: "D:/MyABPProject"
 Interface: "Services/OrderProcessing/IOrderProcessingDomainService.cs"
 Service: "Services/OrderProcessing/OrderProcessingDomainService.cs"
 Tests: "Tests/OrderProcessing/OrderProcessingDomainServiceTests.cs"
+Documentation: "docs/DEV/DomainServices_OrderProcessing.md"
 Prompt: "prompts/DOMAIN_SERVICE_OrderProcessing_Prompt.md"
 ```
 
 ## 11. EXTENSIBILITY
 
 ### Adding New Service Patterns:
+
 1. **Extend DOMAIN_SERVICE_CLASSES_SECTION**
-2. **Update BUSINESS_LOGIC_SECTION** 
+2. **Update BUSINESS_LOGIC_SECTION**
 3. **Modify UNIT_TESTS_SECTION**
 4. **Test với existing features**
 
 ### Framework Updates:
+
 1. **Update PROJECT_FRAMEWORK_INFO**
 2. **Modify service conventions**
 3. **Adjust namespace patterns**
 4. **Update validation checklist**
 
 ### Custom Business Logic Patterns:
+
 1. **Extend WORKFLOWS_MAPPING_SECTION**
 2. **Update BUSINESS_LOGIC_SECTION**
 3. **Modify exception handling patterns**

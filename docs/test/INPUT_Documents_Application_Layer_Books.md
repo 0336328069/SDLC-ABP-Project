@@ -1,7 +1,5 @@
 # Generated Application Layer Files - Book Management
 
-Đây là file mô phỏng output từ Application Layer generation để làm input cho các META prompt khác. File này thể hiện Application Layer đã được generate cho tính năng Quản lý Sách.
-
 ## Application Layer Overview
 
 Application Layer đã được generate với đầy đủ các Application Services, DTOs, AutoMapper profiles, và validation logic. Tầng này kết nối Domain Layer với Infrastructure và Presentation Layer.

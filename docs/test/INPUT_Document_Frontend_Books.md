@@ -1,7 +1,5 @@
 # Generated Frontend Files - Book Management
 
-Đây là file mô phỏng output từ Frontend generation để làm input cho các META prompt khác. File này thể hiện Frontend application đã được generate cho tính năng Quản lý Sách với Next.js và React.
-
 ## Frontend Overview
 
 Frontend đã được generate với đầy đủ các pages, components, hooks, services, và state management. Application được thiết kế theo modern React patterns với TypeScript, Tailwind CSS, và các best practices.

@@ -17,7 +17,7 @@ Bạn là một Senior Software Architect chuyên về Domain-Driven Design và 
 **Database**: SQL Server with Entity Framework Core 9.0
 
 ### Input Documents đã phân tích:
-- **BussinessLogic_Authentication.md**: Comprehensive business logic for Authentication domain including entities (AppUser, PasswordResetToken), value objects (EmailAddress, Password), specifications, domain events, and security workflows
+- **Document_Domain_Model_Authentication.md**: Comprehensive business logic for Authentication domain including entities (AppUser, PasswordResetToken), value objects (EmailAddress, Password), specifications, domain events, and security workflows
 - **ImplementPlan_Authentication.md**: Technical implementation plan for Authentication system with ABP Framework, JWT tokens, and secure password management using BCrypt
 - **PRD_Authentication_v1.0.md**: Business requirements for user registration, login, password reset, and logout flows with security and UX considerations
 

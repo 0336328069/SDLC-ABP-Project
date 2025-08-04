@@ -9,11 +9,11 @@ Bạn là một AI Prompt Engineer chuyên tạo prompts cho việc generate Bac
 **Input cần thiết**:
 
 1. **API*Swagger*[FeatureName].yaml** - API design specification
-2. **PRD\_[FeatureName].md** - Product requirements và user flows
-3. **SRS&DM\_[FeatureName].md** - Software requirements specification
-4. **US\_[FeatureName].md** - Use case specifications
-5. **ImplementPlan\_[FeatureName].md** - Implementation function planning
-6. **CodeConventionDocument\_[FeatureName].md** - Code standards và conventions
+2. **PRD_[FeatureName].md** - Product requirements và user flows
+3. **SRS&DM_[FeatureName].md** - Software requirements specification
+4. **US_[FeatureName].md** - Use case specifications
+5. **ImplementPlan_[FeatureName].md** - Implementation function planning
+6. **CodeConventionDocument_[FeatureName].md** - Code standards và conventions
 7. **Feature Name** - Tên feature cần generate backend API
 8. **Project Path** - Đường dẫn đến thư mục gốc project liên quan đến backend
 
@@ -36,6 +36,7 @@ Tạo ra một prompt chi tiết để generate Backend API Implementation cho b
 - Proper authentication, authorization, và validation
 - Complete API controller implementation với DTOs
 - Exception handling và logging best practices
+- Complete API documentation
 
 ## 4. TEMPLATE GENERATION PROCESS
 
@@ -142,6 +143,10 @@ Bạn là một Senior Software Architect chuyên về Clean Architecture và Mu
 ### 3.6 UNIT TESTS / INTEGRATION TESTS
 
 {TESTING_SECTION}
+
+### 3.7 DOCUMENTATION
+
+{DOCUMENTATION_SECTION}
 
 ## 4. YÊU CẦU IMPLEMENTATION
 
@@ -368,7 +373,186 @@ Testing strategy implementation:
 - Authentication scenarios: {AuthTests}
 ```
 
-### 8.7 IMPLEMENTATION_REQUIREMENTS_SECTION
+### 8.7 DOCUMENTATION_SECTION
+
+```markdown
+Backend API documentation:
+
+#### BackendAPI\_{FeatureName}.md
+
+Tạo comprehensive API documentation file tại `docs/DEV/Documents_Backend_API_{FeatureName}.md` với nội dung:
+
+##### API Requirements Specification
+
+- Technology Stack Context: {TechnologyStackDetails}
+- API Architecture Principles: {ArchitecturePrinciples}
+- Authentication & Authorization Strategy: {AuthStrategy}
+
+##### Controller Specifications
+
+{FOR_EACH_CONTROLLER}
+
+###### {ControllerName}Controller
+
+- **Base Route**: `{BaseRoute}`
+- **Purpose**: {ControllerPurpose}
+- **Authorization Requirements**: {AuthorizationDetails}
+
+**Endpoints:**
+
+{FOR_EACH_ENDPOINT}
+
+**{HTTP_METHOD} {ENDPOINT_PATH}**
+
+- **Purpose**: {EndpointDescription}
+- **Authorization**: {PermissionRequired}
+- **Parameters**: {ParametersList}
+- **Request Body**: {RequestBodyType}
+- **Response**: {ResponseType}
+- **Status Codes**: {StatusCodesList}
+- **Example Request**:
+  ```json
+  {RequestExample}
+  ```
+- **Example Response**:
+  ```json
+  {ResponseExample}
+  ```
+- **Business Rules**: {BusinessRulesApplied}
+- **Error Scenarios**: {ErrorScenarios}
+
+##### API Response Standards
+
+###### Success Response Format
+```json
+{
+  "data": { /* Actual response data */ },
+  "success": true,
+  "error": null,
+  "unAuthorizedRequest": false,
+  "__abp": true
+}
+```
+
+###### Error Response Format
+```json
+{
+  "error": {
+    "code": "{ErrorCode}",
+    "message": "{ErrorMessage}",
+    "details": "{ErrorDetails}",
+    "data": {},
+    "validationErrors": [
+      {
+        "message": "{ValidationMessage}",
+        "members": ["{FieldName}"]
+      }
+    ]
+  },
+  "success": false,
+  "unAuthorizedRequest": false,
+  "__abp": true
+}
+```
+
+###### Pagination Response Format
+```json
+{
+  "totalCount": 150,
+  "items": [ /* Array of items */ ]
+}
+```
+
+##### Security & Validation
+
+###### Authentication
+- JWT token requirements: {JWTRequirements}
+- Token validation process: {TokenValidation}
+- Token expiration handling: {ExpirationHandling}
+
+###### Authorization
+- Permission-based access control: {PermissionSystem}
+- Role-based endpoint access: {RoleBasedAccess}
+- Resource ownership validation: {OwnershipValidation}
+
+###### Input Validation
+- Model validation rules: {ValidationRules}
+- Custom validation attributes: {CustomValidation}
+- Business rule validation: {BusinessRuleValidation}
+
+###### Rate Limiting
+- Request limits per endpoint: {RateLimits}
+- Burst allowance policies: {BurstPolicies}
+- Rate limit exceeded responses: {RateLimitResponses}
+
+##### Performance Requirements
+
+###### Response Time Targets
+- Simple operations: {SimpleOperationTargets}
+- Search operations: {SearchOperationTargets}
+- Complex operations: {ComplexOperationTargets}
+- File operations: {FileOperationTargets}
+
+###### Caching Strategy
+- Cache policies: {CachePolicies}
+- Cache invalidation: {CacheInvalidation}
+- Cache keys: {CacheKeys}
+
+###### Database Optimization
+- Pagination implementation: {PaginationStrategy}
+- Query optimization: {QueryOptimization}
+- Performance monitoring: {PerformanceMonitoring}
+
+##### Error Handling
+
+###### Custom Exception Types
+- Business exceptions: {BusinessExceptions}
+- Validation exceptions: {ValidationExceptions}
+- Security exceptions: {SecurityExceptions}
+
+###### HTTP Status Code Usage
+- Success codes: {SuccessCodes}
+- Client error codes: {ClientErrorCodes}
+- Server error codes: {ServerErrorCodes}
+
+##### API Testing Strategy
+
+###### Unit Testing
+- Controller testing: {ControllerTests}
+- Mock setup: {MockSetup}
+- Test scenarios: {TestScenarios}
+
+###### Integration Testing
+- End-to-end workflows: {E2EWorkflows}
+- Authentication testing: {AuthTesting}
+- Performance testing: {PerformanceTesting}
+
+##### Swagger/OpenAPI Documentation
+
+###### Configuration
+- API versioning: {APIVersioning}
+- Documentation generation: {DocGeneration}
+- Interactive testing: {InteractiveTesting}
+
+###### Examples and Schemas
+- Request examples: {RequestExamples}
+- Response examples: {ResponseExamples}
+- Schema definitions: {SchemaDefinitions}
+
+##### Monitoring and Observability
+
+###### Logging Strategy
+- Request/Response logging: {RequestResponseLogging}
+- Error logging: {ErrorLogging}
+- Performance logging: {PerformanceLogging}
+
+###### Metrics and Monitoring
+- API metrics: {APIMetrics}
+- Health checks: {HealthChecks}
+- Alerting: {AlertingStrategy}
+```
+
+### 8.8 IMPLEMENTATION_REQUIREMENTS_SECTION
 
 ```markdown
 ## API Implementation Best Practices
@@ -392,7 +576,7 @@ Testing strategy implementation:
 - Exception handling: Global exception filter
 ```
 
-### 8.8 OUTPUT_FORMAT_SECTION
+### 8.9 OUTPUT_FORMAT_SECTION
 
 ```markdown
 **QUAN TRỌNG**: Generate ACTUAL CODE FILES:
@@ -403,10 +587,24 @@ Testing strategy implementation:
 4. **Test Files**: `Tests/{FeatureName}/*Tests.cs`
 5. **Additional Files**: {AdditionalAPIFiles}
 
+#### Documentation Files
+
+6. **Backend API Documentation**: `docs/DEV/Documents_Backend_API_{FeatureName}.md`
+   - Complete API specification với endpoint documentation
+   - Request/Response examples và schemas
+   - Authentication và authorization requirements
+   - Security và validation guidelines
+   - Performance requirements và caching strategies
+   - Error handling và status code usage
+   - Testing strategies và examples
+   - Swagger/OpenAPI configuration
+   - Monitoring và observability setup
+
 Each file must be complete, compilable code following ABP Framework conventions.
+Each documentation file must be comprehensive và accessible for API consumers.
 ```
 
-### 8.9 QUALITY_STANDARDS_SECTION
+### 8.10 QUALITY_STANDARDS_SECTION
 
 ```markdown
 API Quality Checklist:
@@ -426,7 +624,7 @@ API Quality Checklist:
 - [ ] Clean architecture layer separation
 ```
 
-### 8.10 WORKFLOWS_MAPPING_SECTION
+### 8.11 WORKFLOWS_MAPPING_SECTION
 
 ```markdown
 Business workflows to API mapping:
@@ -492,6 +690,7 @@ Controller: "Controllers/UserManagement/UserManagementController.cs"
 DTOs: "Contracts/UserManagement/DTOs/*.cs"
 Contract: "Contracts/UserManagement/IUserManagementAppService.cs"
 Tests: "Tests/UserManagement/*Tests.cs"
+Documentation: "docs/DEV/Documents_Backend_API_UserManagement.md"
 Prompt: "prompts/BACKEND_API_UserManagement_Prompt.md"
 ```
 

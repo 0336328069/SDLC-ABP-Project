@@ -8,11 +8,12 @@ Bạn là một AI Prompt Engineer chuyên tạo prompts cho việc generate Dom
 
 **Input cần thiết**:
 
-1. **BussinessLogic\_[FeatureName].md** - Domain model đã được thiết kế
-2. **ImplementPlan\_[FeatureName].md** - Chi tiết kỹ thuật implementation
-3. **PRD\_[FeatureName].md** - Business requirements và workflows
-4. **Feature Name** - Tên feature cần generate domain services
-5. **Project Path** - Đường dẫn đến thư mục gốc project liên quan đến backend
+1. **BusinessLogic_[FeatureName].md** - BusinessLogic của domain model
+2. **Document_Domain_Model_[FeatureName].md** - Domain model đã được thiết kế
+3. **ImplementPlan_[FeatureName].md** - Chi tiết kỹ thuật implementation
+4. **PRD_[FeatureName].md** - Business requirements và workflows
+5. **Feature Name** - Tên feature cần generate domain services
+6. **Project Path** - Đường dẫn đến thư mục gốc project liên quan đến backend
 
 **Dynamic Project Information** (extracted from inputs):
 
@@ -42,9 +43,10 @@ Tạo file `DOMAIN_SERVICE_{FeatureName}_Prompt.md` để:
 
 ```
 Đọc và phân tích:
-- BussinessLogic_[FeatureName].md → Extract domain entities, aggregates, repositories
+- Document_Domain_Model_[FeatureName].md → Extract domain entities, aggregates, repositories
 - ImplementPlan_[FeatureName].md → Extract business workflows và technical specs
 - PRD_[FeatureName].md → Extract business rules, user stories, validation logic
+- BusinessLogic_[FeatureName].md - Extract business logic, rules, and workflows implemented in domain model
 ```
 
 ### Bước 2: Identify Domain Service Components
@@ -366,7 +368,7 @@ Domain Service documentation:
 
 #### DomainServices\_{FeatureName}.md
 
-Tạo comprehensive documentation file tại `docs/DEV/DomainServices_{FeatureName}.md` với nội dung:
+Tạo comprehensive documentation file tại `docs/DEV/Documents_Domain_Services_{FeatureName}.md` với nội dung:
 
 ##### Domain Services Overview
 
@@ -447,7 +449,7 @@ Tạo comprehensive documentation file tại `docs/DEV/DomainServices_{FeatureNa
 
 #### Documentation Files
 
-5. **Domain Service Documentation**: `docs/DEV/DomainServices_{FeatureName}.md`
+5. **Domain Service Documentation**: `docs/DEV/Documents_Domain_Services_{FeatureName}.md`
    - Chi tiết về domain services được implement
    - Business logic và domain rules
    - Method documentation với parameters và return values
@@ -529,7 +531,7 @@ Business workflows implementation mapping:
 ```bash
 # Input
 Feature Name: "OrderProcessing"
-BussinessLogic: "docs/DEV/BussinessLogic_OrderProcessing.md"
+BussinessLogic: "docs/DEV/BusinessLogicOrderProcessing.md"
 ImplementPlan: "docs/DEV/ImplementPlan_OrderProcessing.md"
 PRD: "docs/BA/PRD_OrderProcessing_v1.0.md"
 Project Root: "D:/MyABPProject"
@@ -538,7 +540,7 @@ Project Root: "D:/MyABPProject"
 Interface: "Services/OrderProcessing/IOrderProcessingDomainService.cs"
 Service: "Services/OrderProcessing/OrderProcessingDomainService.cs"
 Tests: "Tests/OrderProcessing/OrderProcessingDomainServiceTests.cs"
-Documentation: "docs/DEV/DomainServices_OrderProcessing.md"
+Documentation: "docs/DEV/Documents_Domain_Services_OrderProcessing.md"
 Prompt: "prompts/DOMAIN_SERVICE_OrderProcessing_Prompt.md"
 ```
 

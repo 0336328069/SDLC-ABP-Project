@@ -235,8 +235,8 @@ Tạo tất cả các file code theo structure đã định nghĩa:
 5. **Domain Events**: Business event definitions
 
 #### Documentation Files
-1. **`BussinessLogic_Authentication.md`**: Chi tiết business logic và rules
-   - Location: `docs/DEV/BussinessLogic_Authentication.md`
+1. **`Document_Domain_Model_Authentication.md`**: Chi tiết business logic và rules
+   - Location: `docs/DEV/Document_Domain_Model_Authentication.md`
    - Content: Business rules, entity behaviors, workflows, invariants
    
 2. **Domain Model Overview**: Tổng quan về domain model được tạo
@@ -247,7 +247,7 @@ Tạo tất cả các file code theo structure đã định nghĩa:
 - Include proper using statements và dependencies
 
 ## 6. BUSINESS LOGIC DOCUMENTATION
-Tạo file `BussinessLogic_Authentication.md` với nội dung:
+Tạo file `Document_Domain_Model_Authentication.md` với nội dung:
 - **Business Rules**: Các quy tắc nghiệp vụ được implement trong domain model
 - **Entity Behaviors**: Mô tả các hành vi và methods của entities
 - **Value Object Logic**: Giải thích logic được encapsulate trong value objects

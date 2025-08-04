@@ -1,7 +1,5 @@
 # Generated Backend API Files - Book Management
 
-Đây là file mô phỏng output từ Backend API generation để làm input cho các META prompt khác. File này thể hiện các API controllers và cấu hình đã được generate cho tính năng Quản lý Sách.
-
 ## Backend API Overview
 
 Backend API đã được generate với đầy đủ các Controllers, DTOs validation, middleware, swagger documentation, và error handling. API được thiết kế theo RESTful principles và ABP Framework conventions.

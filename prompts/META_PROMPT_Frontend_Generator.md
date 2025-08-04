@@ -32,6 +32,7 @@ Tạo ra một prompt chi tiết để generate Frontend Implementation cho bấ
 - API integration với backend services
 - Complete component testing coverage
 - Performance optimization patterns
+- Complete frontend documentation
 
 ## 4. TEMPLATE GENERATION PROCESS
 
@@ -136,6 +137,9 @@ Bạn là một Senior Frontend Architect chuyên về Modern Frontend Developme
 
 ### 3.8 TESTING IMPLEMENTATION
 {TESTING_SECTION}
+
+### 3.9 DOCUMENTATION
+{DOCUMENTATION_SECTION}
 
 ## 4. YÊU CẦU IMPLEMENTATION
 {IMPLEMENTATION_REQUIREMENTS_SECTION}
@@ -397,7 +401,231 @@ Testing implementation:
 - `src/tests/{FeatureName}/{ServiceName}.test.{ext}`
 ```
 
-### 8.9 IMPLEMENTATION_REQUIREMENTS_SECTION
+### 8.9 DOCUMENTATION_SECTION
+
+```markdown
+Frontend documentation:
+
+#### Frontend\_{FeatureName}.md
+
+Tạo comprehensive frontend documentation file tại `docs/DEV/Documents_Frontend_{FeatureName}.md` với nội dung:
+
+##### Frontend Overview
+
+- Application structure và architecture patterns
+- Technology stack được sử dụng: {TechnologyStack}
+- Key features và functionality implemented
+- User flows và navigation structure
+
+##### Generated Application Structure
+
+###### File Organization
+```
+src/frontend/
+├── app/ (hoặc pages/)      # Route-level pages
+├── components/             # UI Components
+├── hooks/ (hoặc composables/) # Custom hooks/composables
+├── services/              # API integration
+├── stores/ (hoặc state/)  # State management
+├── utils/                 # Utilities
+└── types/                 # Type definitions
+```
+
+###### Pages Implementation
+{FOR_EACH_PAGE}
+
+**{PageName}Page**
+- **Route**: `{RoutePattern}`
+- **Purpose**: {PageDescription}
+- **Components Used**: {ComponentsList}
+- **State Management**: {StateUsage}
+- **API Integration**: {APICallsList}
+- **Key Features**: {PageFeatures}
+
+##### Generated Page Implementations
+
+{FOR_EACH_MAIN_PAGE}
+
+###### {PageName} Page
+
+- **File**: `{PageFilePath}`
+- **Purpose**: {PagePurpose}
+- **User Experience**: {UXDescription}
+- **Key Components**:
+  - {Component1}: {ComponentDescription}
+  - {Component2}: {ComponentDescription}
+- **State Management**: {StateManagementDetails}
+- **API Integration**: {APIIntegrationDetails}
+- **Error Handling**: {ErrorHandlingApproach}
+- **Loading States**: {LoadingStateImplementation}
+
+##### Generated Component Implementations
+
+{FOR_EACH_COMPONENT}
+
+###### {ComponentName} Component
+
+- **File**: `{ComponentFilePath}`
+- **Purpose**: {ComponentPurpose}
+- **Props Interface**:
+  ```typescript
+  {PropsInterface}
+  ```
+- **Features**: {ComponentFeatures}
+- **Design System Usage**: {DesignSystemComponents}
+- **Accessibility**: {AccessibilityFeatures}
+- **Responsive Design**: {ResponsiveFeatures}
+
+##### Generated Custom Hooks
+
+{FOR_EACH_HOOK}
+
+###### {HookName}
+
+- **File**: `{HookFilePath}`
+- **Purpose**: {HookPurpose}
+- **Parameters**: {HookParameters}
+- **Return Value**: {HookReturnValue}
+- **Features**:
+  - {Feature1}: {FeatureDescription}
+  - {Feature2}: {FeatureDescription}
+- **Error Handling**: {ErrorHandlingStrategy}
+- **Caching Strategy**: {CachingImplementation}
+
+##### Generated API Services
+
+###### Service Architecture
+- **Base Client**: {APIClientSetup}
+- **Authentication**: {AuthenticationIntegration}
+- **Error Handling**: {GlobalErrorHandling}
+- **Request/Response Interceptors**: {InterceptorLogic}
+
+{FOR_EACH_SERVICE}
+
+###### {ServiceName}
+
+- **File**: `{ServiceFilePath}`
+- **Base URL**: {ServiceBaseURL}
+- **Methods**: {ServiceMethods}
+- **Error Handling**: {ServiceErrorHandling}
+- **Type Safety**: {TypeDefinitions}
+
+##### Generated Type Definitions
+
+###### Type Organization
+- **API Types**: Request/Response interfaces
+- **Domain Types**: Business entity interfaces
+- **UI Types**: Component props và state interfaces
+- **Utility Types**: Helper và generic types
+
+{FOR_EACH_TYPE_FILE}
+
+###### {TypeFileName}
+- **Purpose**: {TypePurpose}
+- **Key Interfaces**: {KeyInterfaces}
+- **Enums**: {EnumDefinitions}
+
+##### State Management Implementation
+
+###### Architecture Pattern
+- **Library Used**: {StateManagementLibrary}
+- **Pattern**: {StatePattern}
+- **Store Organization**: {StoreStructure}
+
+{FOR_EACH_STORE}
+
+###### {StoreName}
+- **Purpose**: {StorePurpose}
+- **State Shape**: {StateStructure}
+- **Actions**: {StoreActions}
+- **Selectors**: {StoreSelectors}
+- **Persistence**: {PersistenceStrategy}
+
+##### UI/UX Implementation Details
+
+###### Design System Integration
+- **UI Library**: {UILibraryUsed}
+- **Design Tokens**: {DesignTokens}
+- **Component Consistency**: {ConsistencyApproach}
+
+###### Responsive Design
+- **Breakpoints**: {ResponsiveBreakpoints}
+- **Mobile-First Approach**: {MobileFirstImplementation}
+- **Touch Interactions**: {TouchOptimizations}
+
+###### Accessibility Features
+- **WCAG Compliance**: {WCAGLevel}
+- **Screen Reader Support**: {ScreenReaderFeatures}
+- **Keyboard Navigation**: {KeyboardNavigationSupport}
+- **Focus Management**: {FocusManagementStrategy}
+
+##### Performance Optimizations
+
+###### Code Splitting
+- **Route-based Splitting**: {RouteSplittingStrategy}
+- **Component Lazy Loading**: {LazyLoadingImplementation}
+- **Bundle Optimization**: {BundleOptimizations}
+
+###### Caching Strategies
+- **API Response Caching**: {APICachingStrategy}
+- **Asset Caching**: {AssetCachingStrategy}
+- **State Persistence**: {StatePersistenceStrategy}
+
+###### Loading Optimizations
+- **Skeleton Screens**: {SkeletonImplementation}
+- **Progressive Loading**: {ProgressiveLoadingStrategy}
+- **Image Optimization**: {ImageOptimizations}
+
+##### Error Handling Strategy
+
+###### Global Error Handling
+- **Error Boundaries**: {ErrorBoundaryImplementation}
+- **API Error Handling**: {APIErrorStrategy}
+- **User Feedback**: {UserFeedbackMechanism}
+
+###### User Experience
+- **Loading States**: {LoadingStatePatterns}
+- **Empty States**: {EmptyStateDesigns}
+- **Error Recovery**: {ErrorRecoveryOptions}
+
+##### Testing Implementation
+
+###### Testing Strategy
+- **Unit Testing**: {UnitTestingApproach}
+- **Integration Testing**: {IntegrationTestingStrategy}
+- **E2E Testing**: {E2ETestingFramework}
+
+###### Test Coverage
+- **Component Testing**: {ComponentTestCoverage}
+- **Hook Testing**: {HookTestingStrategy}
+- **Service Testing**: {ServiceTestingApproach}
+
+##### Development Workflow
+
+###### Build Process
+- **Build Tool**: {BuildTool}
+- **Development Server**: {DevServerSetup}
+- **Hot Reloading**: {HotReloadConfiguration}
+
+###### Code Quality
+- **Linting**: {LintingSetup}
+- **Type Checking**: {TypeCheckingConfiguration}
+- **Formatting**: {CodeFormattingRules}
+
+##### Deployment Considerations
+
+###### Build Configuration
+- **Environment Variables**: {EnvironmentVariables}
+- **Build Optimization**: {BuildOptimizations}
+- **Static Asset Handling**: {StaticAssetStrategy}
+
+###### Performance Monitoring
+- **Metrics Tracking**: {MetricsImplementation}
+- **Error Tracking**: {ErrorTrackingSetup}
+- **User Analytics**: {AnalyticsIntegration}
+```
+
+### 8.10 IMPLEMENTATION_REQUIREMENTS_SECTION
 ```markdown
 ## Frontend Implementation Best Practices
 - **DO**: Follow component composition patterns
@@ -418,7 +646,7 @@ Testing implementation:
 - Performance optimization: {PerformancePatterns}
 ```
 
-### 8.10 OUTPUT_FORMAT_SECTION
+### 8.11 OUTPUT_FORMAT_SECTION
 ```markdown
 **QUAN TRỌNG**: Generate ACTUAL CODE FILES:
 
@@ -431,10 +659,28 @@ Testing implementation:
 7. **Tests**: `src/tests/{FeatureName}/*.test.{ext}`
 8. **Routes**: `src/routes/{FeatureName}Routes.{ext}`
 
+#### Documentation Files
+
+9. **Frontend Documentation**: `docs/DEV/Documents_Frontend_{FeatureName}.md`
+   - Complete frontend implementation overview
+   - Page implementations với detailed descriptions
+   - Component documentation với props interfaces
+   - Custom hooks documentation
+   - API services documentation
+   - Type definitions overview
+   - State management architecture
+   - UI/UX implementation details
+   - Performance optimizations
+   - Error handling strategies
+   - Testing implementation
+   - Development workflow
+   - Deployment considerations
+
 Each file must be complete, compilable code following modern frontend best practices.
+Each documentation file must be comprehensive và accessible for frontend developers.
 ```
 
-### 8.11 UI_UX_STANDARDS_SECTION
+### 8.12 UI_UX_STANDARDS_SECTION
 ```markdown
 UI/UX Quality Standards:
 - [ ] Responsive design (mobile-first approach)
@@ -451,7 +697,7 @@ UI/UX Quality Standards:
 - [ ] Consistent spacing và typography scales
 ```
 
-### 8.12 WORKFLOWS_MAPPING_SECTION
+### 8.13 WORKFLOWS_MAPPING_SECTION
 ```markdown
 Business workflows to frontend mapping:
 
@@ -513,6 +759,7 @@ Components: "src/components/UserManagement/*.jsx"
 Services: "src/services/UserManagementApiService.js"
 State: "src/stores/UserManagementStore.js"
 Tests: "src/tests/UserManagement/*.test.jsx"
+Documentation: "docs/DEV/Documents_Frontend_UserManagement.md"
 Prompt: "prompts/FRONTEND_UserManagement_Prompt.md"
 ```
 

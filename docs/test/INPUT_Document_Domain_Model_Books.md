@@ -1,7 +1,5 @@
 # Generated Domain Model Files - Book Management
 
-Đây là file mô phỏng output từ Domain Model generation để làm input cho các META prompt khác. File này thể hiện các thành phần domain model đã được generate cho tính năng Quản lý Sách.
-
 ## Domain Model Overview
 
 Hệ thống Book Management được thiết kế theo Domain-Driven Design với các thành phần chính:

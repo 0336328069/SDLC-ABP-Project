@@ -5,15 +5,14 @@ Bạn là một AI Prompt Engineer chuyên tạo prompts cho việc generate App
 
 ## 2. BỐI CẢNH
 **Input cần thiết**:
-1. **BussinessLogic_[FeatureName].md** - Domain model và business logic đã được thiết kế
-2. **Generated Domain Model Files** - Output từ Domain Model generation  
-3. **Generated Domain Service Files** - Output từ Domain Service generation
-4. **ImplementPlan_[FeatureName].md** - Chi tiết kỹ thuật implementation
-5. **PRD_[FeatureName].md** - Product requirements và user flows
-6. **SRS&DM_[FeatureName].md** - Software requirements specification
-7. **US_[FeatureName].md** - Use case specifications
-8. **Feature Name** - Tên feature cần generate application layer
-9. **Project Path** - Đường dẫn đến thư mục gốc project liên quan đến backend
+1. **INPUT_Document_Domain_Model_[FeatureName].md** - Output từ Domain Model generation  
+2. **INPUT_Document_Domain_Service_[FeatureName].md** - Output từ Domain Service generation
+3. **ImplementPlan_[FeatureName].md** - Chi tiết kỹ thuật implementation
+4. **PRD_[FeatureName].md** - Product requirements và user flows
+5. **SRS&DM_[FeatureName].md** - Software requirements specification
+6. **US_[FeatureName].md** - Use case specifications
+7. **Feature Name** - Tên feature cần generate application layer
+8. **Project Path** - Đường dẫn đến thư mục gốc project liên quan đến backend
 
 **Dynamic Project Information** (extracted from inputs):
 - **Technology Stack**: {AUTO_DETECT_FROM_CODEBASE_AND_IMPLEMENTPLAN}
@@ -34,13 +33,14 @@ Tạo ra một prompt chi tiết để generate Application Layer Implementation
 - Background Jobs và Event Handlers integration
 - Comprehensive unit testing coverage
 - ABP Module configuration và dependency injection
+- Complete application layer documentation
 
 ## 4. TEMPLATE GENERATION PROCESS
 
 ### Bước 1: Phân tích Input Documents và Generated Files
 ```
 Đọc và phân tích:
-- BussinessLogic_[FeatureName].md → Extract domain entities, repositories, services
+- Document_Domain_Model_[FeatureName].md → Extract domain entities, repositories, services
 - Generated Domain Model Files → Extract available entities, value objects, repositories
 - Generated Domain Service Files → Extract domain operations, business rules
 - ImplementPlan_[FeatureName].md → Extract application layer requirements
@@ -119,7 +119,7 @@ Bạn là một Senior Software Architect chuyên về ABP Framework Application
 - **Build Command**: {DETECTED_BUILD_COMMAND}
 
 ### Input Documents đã phân tích:
-- **BussinessLogic_{FeatureName}.md**: {DOMAIN_MODEL_SUMMARY}
+- **Document_Domain_Model_{FeatureName}.md**: {DOMAIN_MODEL_SUMMARY}
 - **Generated Domain Files**: {DOMAIN_COMPONENTS_SUMMARY}
 - **Generated Domain Services**: {DOMAIN_SERVICES_SUMMARY}
 - **ImplementPlan_{FeatureName}.md**: {IMPLEMENTATION_SUMMARY}
@@ -158,6 +158,9 @@ Bạn là một Senior Software Architect chuyên về ABP Framework Application
 
 ### 3.8 UNIT TESTS
 {UNIT_TESTS_SECTION}
+
+### 3.9 DOCUMENTATION
+{DOCUMENTATION_SECTION}
 
 ## 4. YÊU CẦU IMPLEMENTATION
 {IMPLEMENTATION_REQUIREMENTS_SECTION}
@@ -378,7 +381,107 @@ Domain event handlers:
 - Data synchronization
 ```
 
-### 8.8 IMPLEMENTATION_REQUIREMENTS_SECTION
+### 8.8 DOCUMENTATION_SECTION
+
+```markdown
+Application Layer documentation:
+
+#### ApplicationLayer\_{FeatureName}.md
+
+Tạo comprehensive documentation file tại `docs/DEV/Documents_Application_Layer_{FeatureName}.md` với nội dung:
+
+##### Application Layer Overview
+
+- Application Services purpose và responsibilities
+- Key business operations implemented
+- Integration với Domain Layer và Infrastructure Layer
+- Architecture pattern used (Single Layer/Multi Layer)
+
+##### Application Services Documentation
+
+{FOR_EACH_APPLICATION_SERVICE}
+
+###### {ServiceName}AppService
+
+- **Purpose**: {ServiceDescription}
+- **Methods**:
+  - `{MethodName}`: {MethodDescription}
+    - **Parameters**: {ParametersList}
+    - **Return**: {ReturnTypeDescription}
+    - **Authorization**: {AuthorizationRequirements}
+    - **Business Rules**: {BusinessRulesApplied}
+    - **Exceptions**: {PossibleExceptions}
+    - **Usage Example**:
+      ```csharp
+      {UsageExample}
+      ```
+
+##### DTOs Documentation
+
+###### Request DTOs
+{FOR_EACH_REQUEST_DTO}
+- **{DtoName}**: {DtoDescription}
+  - Properties: {PropertiesList}
+  - Validation Rules: {ValidationRulesList}
+
+###### Response DTOs
+{FOR_EACH_RESPONSE_DTO}
+- **{DtoName}**: {DtoDescription}
+  - Properties: {PropertiesList}
+  - Mapping Logic: {MappingDetails}
+
+##### Permission System
+
+- Permission Groups: {PermissionGroupsList}
+- Permission Hierarchy: {PermissionHierarchy}
+- Usage in Application Services: {PermissionUsageExamples}
+
+##### AutoMapper Configuration
+
+- Mapping Profiles: {MappingProfilesList}
+- Custom Converters: {CustomConvertersList}
+- Complex Mapping Logic: {ComplexMappingExamples}
+
+##### Background Jobs Integration
+
+- Job Types: {BackgroundJobsList}
+- Job Scheduling: {SchedulingPatterns}
+- Error Handling: {JobErrorHandling}
+
+##### Event Handling
+
+- Domain Events Handled: {DomainEventsList}
+- Event Processing Logic: {EventProcessingDetails}
+- Integration Events: {IntegrationEventsList}
+
+##### Error Handling Strategy
+
+- Business Exceptions: {BusinessExceptionsList}
+- Error Response Format: {ErrorResponseFormat}
+- Localization: {LocalizationDetails}
+
+##### Performance Considerations
+
+- Caching Strategies: {CachingImplementation}
+- Query Optimization: {QueryOptimizationTechniques}
+- Pagination: {PaginationImplementation}
+- Async Processing: {AsyncProcessingPatterns}
+
+##### Testing Guidelines
+
+- Unit Test Scenarios: {TestScenarios}
+- Mock Setup Requirements: {MockRequirements}
+- Integration Test Considerations: {IntegrationTestNotes}
+- Test Coverage Requirements: {CoverageRequirements}
+
+##### Configuration and Deployment
+
+- Module Dependencies: {ModuleDependencies}
+- Configuration Settings: {ConfigurationSettings}
+- Environment-Specific Settings: {EnvironmentSettings}
+```
+
+### 8.9 IMPLEMENTATION_REQUIREMENTS_SECTION
 ```markdown
 ## ABP Application Layer Best Practices
 - **DO**: Use dependency injection cho all services
@@ -399,7 +502,7 @@ Domain event handlers:
 - Service registration: Automatic với ABP dependency injection
 ```
 
-### 8.9 OUTPUT_FORMAT_SECTION
+### 8.10 OUTPUT_FORMAT_SECTION
 ```markdown
 **QUAN TRỌNG**: Generate ACTUAL CODE FILES:
 
@@ -412,6 +515,7 @@ Domain event handlers:
 6. **Background Jobs**: `Application/BackgroundJobs/{FeatureName}/*.cs`
 7. **Event Handlers**: `Application/EventHandlers/{FeatureName}/*.cs`
 8. **Unit Tests**: `Tests/Application/{FeatureName}*.cs`
+9. **Documentation**: `docs/DEV/Documents_Application_Layer_{FeatureName}.md`
 
 {ELSE_IF_MULTI_LAYER_ARCHITECTURE}
 1. **Application Project Files**:
@@ -430,7 +534,21 @@ Domain event handlers:
 3. **Test Files**:
    - `{ProjectName}.Application.Tests/{FeatureName}/*.cs`
 
-Each file must be complete, compilable C# code following ABP Framework conventions.
+#### Documentation Files
+
+4. **Application Layer Documentation**: `docs/DEV/Documents_Application_Layer_{FeatureName}.md`
+   - Chi tiết về application services được implement
+   - DTOs documentation với validation rules
+   - Permission system configuration
+   - AutoMapper profiles và mapping logic
+   - Background jobs và event handlers
+   - Error handling strategies
+   - Performance considerations
+   - Testing guidelines và best practices
+   - Configuration và deployment notes
+
+Each code file must be complete, compilable C# code following ABP Framework conventions.
+Each documentation file must be comprehensive và accessible for developers.
 ```
 
 ## 9. VALIDATION RULES
@@ -464,7 +582,7 @@ Each file must be complete, compilable C# code following ABP Framework conventio
 ```bash
 # Input
 Feature Name: "UserManagement"
-BussinessLogic: "docs/DEV/BussinessLogic_UserManagement.md"
+BussinessLogic: "docs/DEV/Document_Domain_Model_UserManagement.md"
 Generated Domain: ["Entities/User.cs", "Services/UserDomainService.cs"]
 Generated Domain Services: ["UserManager.cs"]
 ImplementPlan: "docs/DEV/ImplementPlan_UserManagement.md"
@@ -479,11 +597,13 @@ Single Layer:
 - Contracts: "Application/Contracts/UserManagement/IUserManagementAppService.cs"
 - DTOs: "Application/Contracts/UserManagement/DTOs/*.cs"
 - Tests: "Tests/Application/UserManagement*.cs"
+- Documentation: "docs/DEV/Documents_Application_Layer_UserManagement.md"
 
 Multi Layer:
 - App Services: "MyProject.Application/Services/UserManagement/*.cs"
 - Contracts: "MyProject.Application.Contracts/Services/UserManagement/*.cs"
 - DTOs: "MyProject.Application.Contracts/DTOs/UserManagement/*.cs"
+- Documentation: "docs/DEV/Documents_Application_Layer_UserManagement.md"
 Prompt: "prompts/APPLICATION_LAYER_UserManagement_Prompt.md"
 ```
 

@@ -8,8 +8,8 @@ Bạn là một AI Prompt Engineer. Nhiệm vụ của bạn là **tạo ra mộ
 
 **Input cần thiết**:
 
-1. **ImplementPlan\_[FeatureName].md** - Chi tiết kỹ thuật implementation
-2. **PRD\_[FeatureName].md** - Product requirements và user flows
+1. **INPUT_ImplementPlan_[FeatureName].md** - Chi tiết kỹ thuật implementation
+2. **INPUT_PRD_[FeatureName].md** - Product requirements và user flows
 3. **Code Standard Analysis** - Cấu trúc và conventions hiện tại từ codebase
 4. **Feature Name** - Tên feature cần tạo domain model
 5. **Project Path** - Đường dẫn đến thư mục gốc project liên quan đến backend. Trong thư mục đã có sẵn dự án.
@@ -169,11 +169,11 @@ Tạo các thành phần cốt lõi của Domain Model. _Lưu ý: Domain Service
 
 ## 6. BUSINESS LOGIC DOCUMENTATION
 
-Tạo file `Businesslogic_{FeatureName}.md` với nội dung:
+Tạo file `Document_Domain_Model_{FeatureName}.md` với nội dung:
 
 ### 6.1 Domain Invariants Documentation
 
-Trong file `Businesslogic_{FeatureName}.md`, PHẢI bao gồm:
+Trong file `Document_Domain_Model_{FeatureName}.md`, PHẢI bao gồm:
 
 #### Aggregate Invariants
 
@@ -425,8 +425,8 @@ Tạo tất cả các file code theo structure đã định nghĩa:
 
 #### Documentation Files
 
-1. **`Businesslogic_{FeatureName}.md`**: Chi tiết business logic và rules
-   - Location: `docs/DEV/Businesslogic_{FeatureName}.md`
+1. **`Document_Domain_Model_{FeatureName}.md`**: Chi tiết business logic và rules
+   - Location: `docs/DEV/Document_Domain_Model_{FeatureName}.md`
    - Content: Business rules, entity behaviors, workflows, invariants
 2. **Domain Model Overview**: Tổng quan về domain model được tạo
 
@@ -480,7 +480,7 @@ Place Entities in Entities/{FeatureName}/, ValueObjects in Entities/{FeatureName
 Add necessary using directives and dependency injections.
 
 Documentation Requirements
-Generate docs/DEV/BUSINESSLOGIC_{FeatureName}.md containing:
+Generate docs/DEV/Document_Domain_Model_{FeatureName}.md containing:
 
 RuleName: Description, trigger, exception type.
 

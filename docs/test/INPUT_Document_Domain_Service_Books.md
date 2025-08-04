@@ -1,7 +1,5 @@
 # Generated Domain Service Files - Book Management
 
-Đây là file mô phỏng output từ Domain Service generation để làm input cho các META prompt khác. File này thể hiện các domain service đã được generate cho tính năng Quản lý Sách.
-
 ## Domain Services Overview
 
 Các Domain Service được thiết kế để xử lý logic nghiệp vụ phức tạp không thuộc về một entity cụ thể nào, đảm bảo tính nhất quán của business rules.
